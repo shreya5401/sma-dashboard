@@ -1,0 +1,31 @@
+id,text,author,followers,likes,retweets,replies,hashtags,created_at,platform
+1,"Tesla just hit 2 million vehicles delivered worldwide! A massive milestone. #Tesla #EV #ElectricVehicles",elon_fan,45230,1240,380,125,"Tesla,EV,ElectricVehicles",2024-01-15T10:30:00Z,x
+2,"Is $TSLA overvalued? Stock dropped 20% amid rising competition from legacy automakers. #Tesla #TSLA #Investing",investor_mike,8920,89,45,67,"Tesla,TSLA,Investing",2024-01-15T11:00:00Z,x
+3,"Just took delivery of my new Tesla Model Y. The Autopilot feature is absolutely incredible! #Tesla #ModelY",sarah_drives,3210,542,98,203,"Tesla,ModelY",2024-01-15T12:15:00Z,x
+4,"Tesla Supercharger network now has over 50000 stations globally. No other EV brand comes close. #Tesla #EV",ev_advocate,12800,678,234,89,"Tesla,EV",2024-01-15T13:00:00Z,x
+5,"Disappointed with my Tesla service experience. Waited 3 weeks for a simple repair. Customer support is lacking. #Tesla",unhappy_owner,1890,234,56,178,"Tesla",2024-01-15T13:30:00Z,x
+6,"Tesla opens massive new Gigafactory in Mexico. 10000 jobs created for local community. #Tesla #Gigafactory #Jobs",business_news,34500,891,412,67,"Tesla,Gigafactory,Jobs",2024-01-15T14:00:00Z,x
+7,"BREAKING: Tesla recalling 200000 vehicles for software issue with backup camera. Safety first! #Tesla #Recall",auto_reporter,28900,456,189,234,"Tesla,Recall",2024-01-15T14:30:00Z,x
+8,"Tesla Model 3 ranked #1 in JD Power reliability study for third consecutive year. @Tesla keeping standards high! #Tesla",reliability_report,9870,723,298,45,"Tesla",2024-01-15T15:00:00Z,x
+9,"Why I switched from Tesla to a traditional gas car after 3 years. Thread below. #Tesla #EV #CarReview",switched_back,5640,389,145,892,"Tesla,EV,CarReview",2024-01-15T15:30:00Z,x
+10,"Tesla AI day announcement incoming. Expect major news on Full Self-Driving and Optimus robot. #Tesla #AI #FSD",tech_watcher,67800,1890,678,345,"Tesla,AI,FSD",2024-01-15T16:00:00Z,x
+11,"@elonfan Tesla needs to fix their app. It crashes every time I try to start pre-conditioning. #Tesla #Bug",app_user,2340,123,34,89,"Tesla,Bug",2024-01-15T16:30:00Z,x
+12,"Tesla quarterly earnings beat Wall Street estimates by 8%. Revenue up 21% year over year. $TSLA rockets! #Tesla #TSLA",financial_times,89200,2340,891,234,"Tesla,TSLA",2024-01-15T17:00:00Z,x
+13,"Love the Tesla community! Met so many amazing people at the local Tesla owners meetup today. #Tesla #Community",community_member,4560,445,112,67,"Tesla,Community",2024-01-15T17:30:00Z,x
+14,"Cybertruck spotted on the highway doing 110mph. The aerodynamics look terrible tbh. #Tesla #Cybertruck",car_critic,15670,678,234,456,"Tesla,Cybertruck",2024-01-15T18:00:00Z,x
+15,"Tesla energy storage division sets new record — 5 GWh deployed in Q4. Solar + battery is the future. #Tesla #CleanEnergy",green_energy,23400,891,345,78,"Tesla,CleanEnergy",2024-01-15T18:30:00Z,x
+16,"Just hit 100000 miles on my Tesla Model S. Zero major issues. Best car I have ever owned. #Tesla #ModelS #100k",long_term_owner,7890,1234,456,123,"Tesla,ModelS",2024-01-15T19:00:00Z,x
+17,"Tesla cuts prices again on Model 3 and Model Y in Europe. Smart move to regain market share. #Tesla #EV #Europe",eu_auto_news,45600,567,234,89,"Tesla,EV,Europe",2024-01-15T19:30:00Z,x
+18,"Frustrated Tesla owner here. My FSD subscription auto-renewed at $199 without warning. @Tesla fix this! #Tesla #FSD",fsd_user,3210,345,89,234,"Tesla,FSD",2024-01-15T20:00:00Z,x
+19,"Tesla partnering with NREL on next-gen solid-state battery technology. Could double range by 2026. #Tesla #Battery",battery_tech,19800,1456,678,123,"Tesla,Battery",2024-01-15T20:30:00Z,x
+20,"The Tesla Semi just completed a 500 mile trip fully loaded. Electric trucking is finally here. #Tesla #TeslaSemi",trucking_news,34500,2189,891,234,"Tesla,TeslaSemi",2024-01-15T21:00:00Z,x
+21,"Ford just released new EV lineup to compete with Tesla. Interesting to see how the market responds. #Ford #EV #Tesla",auto_analyst,28900,456,178,89,"Ford,EV,Tesla",2024-01-15T08:00:00Z,x
+22,"BMW announces 10 new electric models by 2025. Tesla has some serious competition coming. #BMW #EV #Tesla",car_blog,15600,234,89,45,"BMW,EV,Tesla",2024-01-15T08:30:00Z,x
+23,"Ford Mustang Mach-E getting a major software update. Still not as polished as Tesla though. #Ford #MachE #EV",ford_owner,8900,189,67,123,"Ford,MachE,EV",2024-01-15T09:00:00Z,x
+24,"BMW iX owner for 6 months — here is my honest review vs Tesla Model X. Thread. #BMW #Tesla #EVReview",bmw_owner,4560,567,234,345,"BMW,Tesla,EVReview",2024-01-15T09:30:00Z,x
+25,"The EV market is heating up. Tesla still leads but Ford and BMW are closing the gap fast. #EV #Tesla #Ford #BMW",market_watch,67800,890,345,167,"EV,Tesla,Ford,BMW",2024-01-15T10:00:00Z,x
+26,"Tesla Autopilot involved in another accident. Regulators increasing scrutiny on FSD technology. #Tesla #FSD #Safety",safety_reporter,45200,1234,567,890,"Tesla,FSD,Safety",2024-01-15T22:00:00Z,x
+27,"Elon Musk tweets cryptic message about Tesla phone. Could this be real? #Tesla #ElonMusk #TeslaPhone",rumor_mill,23400,3456,1234,567,"Tesla,ElonMusk,TeslaPhone",2024-01-15T22:30:00Z,x
+28,"Tesla insurance now available in 12 states. Rates are surprisingly competitive for Model 3 owners. #Tesla #Insurance",insurance_news,12300,456,123,67,"Tesla,Insurance",2024-01-15T23:00:00Z,x
+29,"Another great day of driving my Tesla. Charged overnight on solar. Zero fuel cost this month! #Tesla #SolarPower",solar_driver,6780,789,234,45,"Tesla,SolarPower",2024-01-15T23:30:00Z,x
+30,"Tesla stock analysis: Overweight rating with $300 price target. Strong fundamentals despite macro headwinds. #TSLA #Tesla",wall_st_analyst,89200,567,234,89,"TSLA,Tesla",2024-01-15T07:00:00Z,x
