@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { RiChat3Line, RiCloseLine, RiRobotLine, RiSendPlane2Line } from '@remixicon/react';
+import { RiChat3Line, RiCloseLine, RiRobotLine, RiSendPlane2Line, RiExpandDiagonalLine, RiCollapseDiagonalLine } from '@remixicon/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAtomValue } from 'jotai';
 import { keywordAtom } from '@/lib/atoms';
@@ -18,6 +18,7 @@ const QUICK_SUGGESTIONS = [
 
 export default function ChatbotPopup() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isExpanded, setIsExpanded] = React.useState(false);
   const [showGreeting, setShowGreeting] = React.useState(false);
   const [messages, setMessages] = React.useState<{ role: 'user' | 'bot'; text: string }[]>([
     { role: 'bot', text: 'Hi! I am your SMA Assistant. How can I help you today?' }
@@ -94,9 +95,17 @@ export default function ChatbotPopup() {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+              width: isExpanded ? '500px' : '400px',
+              height: isExpanded ? '800px' : '600px',
+              maxHeight: 'calc(100vh - 100px)'
+            }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="flex h-[600px] w-[400px] flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 shadow-regular-xl ring-1 ring-inset ring-stroke-soft-200"
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="flex flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 shadow-regular-xl ring-1 ring-inset ring-stroke-soft-200"
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-stroke-soft-200 bg-bg-soft-200 px-6 py-5">
@@ -112,9 +121,22 @@ export default function ChatbotPopup() {
                   </div>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="rounded-xl p-2 hover:bg-bg-white-0 transition-colors">
-                <RiCloseLine className="size-6 text-text-soft-400" />
-              </button>
+              <div className="flex items-center gap-1">
+                <button 
+                  onClick={() => setIsExpanded(!isExpanded)} 
+                  className="rounded-xl p-2 hover:bg-bg-white-0 transition-colors"
+                  title={isExpanded ? "Shrink" : "Expand"}
+                >
+                  {isExpanded ? (
+                    <RiCollapseDiagonalLine className="size-5 text-text-soft-400" />
+                  ) : (
+                    <RiExpandDiagonalLine className="size-5 text-text-soft-400" />
+                  )}
+                </button>
+                <button onClick={() => setIsOpen(false)} className="rounded-xl p-2 hover:bg-bg-white-0 transition-colors">
+                  <RiCloseLine className="size-6 text-text-soft-400" />
+                </button>
+              </div>
             </div>
 
             {/* Messages */}
