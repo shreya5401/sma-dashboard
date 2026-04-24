@@ -14,6 +14,22 @@ type SentimentData = { total: number; positive: number; negative: number; neutra
 
 const FALLBACK: SentimentData = { total: 0, positive: 54, negative: 23, neutral: 23, dominant: 'positive' };
 
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const entry = payload[0];
+    return (
+      <div className="rounded-xl border border-white/10 bg-black/60 p-3 shadow-regular-md backdrop-blur-md">
+        <p className="mb-1 text-label-xs font-bold text-white/50 uppercase tracking-wider">{entry.name}</p>
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-label-sm text-white/70">Share</span>
+          <span className="text-label-sm font-bold" style={{ color: entry.payload.color }}>{entry.value}%</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export function WidgetSentimentAnalysis() {
   const keyword = useAtomValue(keywordAtom);
   const { data, loading } = useModuleData<SentimentData>('sentiment', keyword, FALLBACK);
@@ -42,10 +58,13 @@ export function WidgetSentimentAnalysis() {
 
       <ResponsiveContainer width='100%' height={140}>
         <PieChart>
-          <Pie data={chartData} cx='50%' cy='50%' innerRadius={42} outerRadius={64} paddingAngle={3} dataKey='value'>
+          <Pie data={chartData} cx='50%' cy='50%' innerRadius={42} outerRadius={64} paddingAngle={3} dataKey='value' stroke='none'>
             {chartData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
           </Pie>
-          <Tooltip formatter={(v: number) => [`${v}%`, '']} contentStyle={{ borderRadius: '8px', fontSize: '12px' }} />
+          <Tooltip 
+            content={<CustomTooltip />} 
+            wrapperStyle={{ outline: 'none' }}
+          />
         </PieChart>
       </ResponsiveContainer>
 

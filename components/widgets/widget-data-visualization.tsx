@@ -28,6 +28,25 @@ const METRIC_COLORS: Record<string, string> = {
   sentiment: '#22c55e',
 };
 
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-xl border border-white/10 bg-black/60 p-3 shadow-regular-md backdrop-blur-md">
+        <p className="mb-1 text-label-xs font-bold text-white/50 uppercase tracking-wider">{payload[0].payload.date}</p>
+        <div className="flex flex-col gap-1">
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center justify-between gap-4">
+              <span className="text-label-sm text-white/70">Value</span>
+              <span className="text-label-sm font-bold" style={{ color: entry.stroke }}>{entry.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export function WidgetDataVisualization() {
   const keyword = useAtomValue(keywordAtom);
   const { data, loading } = useModuleData<VizData>('data-viz', keyword, FALLBACK);
@@ -68,11 +87,14 @@ export function WidgetDataVisualization() {
               <stop offset='95%' stopColor={color} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray='4 4' className='stroke-stroke-soft-200' />
-          <XAxis dataKey='date' tick={{ fontSize: 11, fill: 'hsl(var(--text-soft-400))' }} axisLine={false} tickLine={false} />
+          <CartesianGrid strokeDasharray='4 4' className='stroke-stroke-soft-200' vertical={false} />
+          <XAxis dataKey='date' hide />
           <YAxis hide />
-          <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px' }} />
-          <Area type='monotone' dataKey='value' stroke={color} strokeWidth={2} fill={`url(#${gradId})`} dot={false} />
+          <Tooltip 
+            content={<CustomTooltip />} 
+            wrapperStyle={{ outline: 'none' }}
+          />
+          <Area type='monotone' dataKey='value' stroke={color} strokeWidth={2} fill={`url(#${gradId})`} dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: color }} />
         </AreaChart>
       </ResponsiveContainer>
     </div>
