@@ -125,7 +125,7 @@ def api_posts(keyword: str = "Tesla", platform: str = "x", limit: int = 50):
     if db is None:
         return {"posts": [], "count": 0, "error": "MongoDB not connected — set MONGODB_URI in .env"}
     posts = list(db["posts"].find(
-        {"keyword": keyword, "platform": platform},
+        {"keyword": {"$regex": f"^{keyword}$", "$options": "i"}, "platform": platform},
         {"_id": 0},
         limit=limit,
         sort=[("fetched_at", -1)],

@@ -68,10 +68,11 @@ def save_posts(posts: list[dict], keyword: str, source: str = "apify") -> None:
     try:
         from pymongo import UpdateOne
         now = datetime.now(timezone.utc)
+        keyword_clean = keyword.strip().title() # Normalize to 'Amazon', 'Tesla', etc.
         ops = [
             UpdateOne(
                 {"post_id": p["id"], "platform": p.get("platform", "x")},
-                {"$set": {**p, "post_id": p["id"], "keyword": keyword,
+                {"$set": {**p, "post_id": p["id"], "keyword": keyword_clean,
                           "fetched_at": now, "source": source}},
                 upsert=True,
             )
@@ -79,13 +80,13 @@ def save_posts(posts: list[dict], keyword: str, source: str = "apify") -> None:
         ]
         db["posts"].bulk_write(ops, ordered=False)
         db["scrape_sessions"].insert_one({
-            "keyword": keyword,
+            "keyword": keyword_clean,
             "platform": posts[0].get("platform", "x"),
             "fetched_at": now,
             "count": len(posts),
             "source": source,
         })
-        print(f"[DB] Saved {len(posts)} posts for '{keyword}'")
+        print(f"[DB] Saved {len(posts)} posts for '{keyword_clean}'")
     except Exception as e:
         print(f"[DB] save_posts failed: {e}")
 
@@ -96,8 +97,9 @@ def load_posts(keyword: str, platform: str) -> list[dict] | None:
     if db is None:
         return None
     try:
+        # Use case-insensitive search
         posts = list(db["posts"].find(
-            {"keyword": keyword, "platform": platform},
+            {"keyword": {"$regex": f"^{keyword}$", "$options": "i"}, "platform": platform},
             {"_id": 0, "post_id": 0, "fetched_at": 0, "source": 0},
         ))
         if posts:
