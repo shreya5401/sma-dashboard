@@ -131,8 +131,7 @@ def api_prediction(keyword: str = "Tesla", platform: str = "x", use_live: bool =
 @app.post("/api/chat")
 def api_chat(data: dict):
     message = data.get("message", "")
-    context = data.get("context", {})
-    return {"response": chatbot.get_chat_response(message, context)}
+    return {"response": chatbot.get_chat_response(message)}
 
 
 @app.get("/api/posts")
