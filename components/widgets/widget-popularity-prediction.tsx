@@ -23,6 +23,25 @@ const FALLBACK: PredData = {
   confidence: 87, model: 'RandomForest', r_squared: 0.87,
 };
 
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-xl border border-white/10 bg-black/60 p-3 shadow-regular-md backdrop-blur-md">
+        <p className="mb-1 text-label-xs font-bold text-white/50 uppercase tracking-wider">{payload[0].payload.day}</p>
+        <div className="flex flex-col gap-1">
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center justify-between gap-4">
+              <span className="text-label-sm text-white/70">{entry.name === 'actual' ? 'Actual' : 'Predicted'}</span>
+              <span className="text-label-sm font-bold" style={{ color: entry.stroke }}>{entry.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export function WidgetPopularityPrediction() {
   const keyword = useAtomValue(keywordAtom);
   const { data, loading } = useModuleData<PredData>('prediction', keyword, FALLBACK);
@@ -47,13 +66,16 @@ export function WidgetPopularityPrediction() {
 
       <ResponsiveContainer width='100%' height={140}>
         <LineChart data={allPoints} margin={{ top: 6, right: 4, left: 0, bottom: 6 }}>
-          <CartesianGrid strokeDasharray='4 4' className='stroke-stroke-soft-200' />
-          <XAxis dataKey='day' tick={{ fontSize: 10, fill: 'hsl(var(--text-soft-400))' }} axisLine={false} tickLine={false} />
+          <CartesianGrid strokeDasharray='4 4' className='stroke-stroke-soft-200' vertical={false} />
+          <XAxis dataKey='day' hide />
           <YAxis hide />
-          <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px' }} formatter={(v: number, n: string) => [v, n === 'actual' ? 'Actual' : 'Predicted']} />
+          <Tooltip 
+            content={<CustomTooltip />} 
+            wrapperStyle={{ outline: 'none' }}
+          />
           <ReferenceLine x={lastHistorical} stroke='hsl(var(--stroke-soft-200))' strokeDasharray='4 4' />
-          <Line dataKey='actual' stroke='hsl(var(--primary-base))' strokeWidth={2} dot={false} connectNulls={false} />
-          <Line dataKey='predicted' stroke='#f59e0b' strokeWidth={2} strokeDasharray='6 3' dot={false} connectNulls />
+          <Line dataKey='actual' stroke='hsl(var(--primary-base))' strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: 'hsl(var(--primary-base))' }} connectNulls={false} />
+          <Line dataKey='predicted' stroke='#f59e0b' strokeWidth={2} strokeDasharray='6 3' dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: '#f59e0b' }} connectNulls />
         </LineChart>
       </ResponsiveContainer>
 

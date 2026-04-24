@@ -20,6 +20,25 @@ const FALLBACK: TrendingData = {
   total_unique: 48, top_tag: '#Tesla', top_count: 412,
 };
 
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-xl border border-white/10 bg-black/60 p-3 shadow-regular-md backdrop-blur-md">
+        <p className="mb-1 text-label-xs font-bold text-white/50 uppercase tracking-wider">{payload[0].payload.tag}</p>
+        <div className="flex flex-col gap-1">
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center justify-between gap-4">
+              <span className="text-label-sm text-white/70">Mentions</span>
+              <span className="text-label-sm font-bold" style={{ color: entry.fill }}>{entry.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export function WidgetTrendingTopics() {
   const keyword = useAtomValue(keywordAtom);
   const { data, loading } = useModuleData<TrendingData>('trending', keyword, FALLBACK);
@@ -43,8 +62,12 @@ export function WidgetTrendingTopics() {
           <CartesianGrid strokeDasharray='4 4' className='stroke-stroke-soft-200' horizontal={false} />
           <XAxis type='number' hide />
           <YAxis type='category' dataKey='tag' tick={{ fontSize: 11, fill: 'hsl(var(--text-sub-600))' }} width={56} axisLine={false} tickLine={false} />
-          <Tooltip formatter={(v: number) => [`${v} mentions`, 'Frequency']} contentStyle={{ borderRadius: '8px', fontSize: '12px' }} />
-          <Bar dataKey='count' fill='hsl(var(--primary-base))' radius={[0, 4, 4, 0]} />
+          <Tooltip 
+            content={<CustomTooltip />} 
+            cursor={{ fill: 'rgba(255,255,255,0.03)', radius: 4 }}
+            wrapperStyle={{ outline: 'none' }}
+          />
+          <Bar dataKey='count' fill='hsl(var(--primary-base))' radius={[0, 4, 4, 0]} barSize={20} />
         </BarChart>
       </ResponsiveContainer>
 

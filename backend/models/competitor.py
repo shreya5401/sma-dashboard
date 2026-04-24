@@ -1,6 +1,24 @@
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 _analyzer = SentimentIntensityAnalyzer()
+
+def find_competitors(keyword: str, all_brands: list[str]) -> list[str]:
+    """Find top 2 brands similar to the keyword using Cosine Similarity."""
+    if not all_brands: return []
+    targets = [b for b in all_brands if b.lower() != keyword.lower()]
+    if not targets: return []
+    
+    # Character-level TF-IDF to find name similarities
+    vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(2, 4))
+    tfidf_matrix = vectorizer.fit_transform(targets + [keyword])
+    similarities = cosine_similarity(tfidf_matrix[-1:], tfidf_matrix[:-1])[0]
+    
+    # Sort and pick top 2
+    top_indices = np.argsort(similarities)[-2:][::-1]
+    return [targets[i] for i in top_indices]
 
 
 def _get_raw_scores(posts: list[dict]) -> dict:

@@ -24,28 +24,10 @@ const FALLBACK: CompData = {
   summary: 'Your brand leads in Strategy & Growth',
 };
 
-const COMPETITOR_MAP: Record<string, string> = {
-  'tesla': 'Apple,Samsung',
-  'apple': 'Samsung,Google',
-  'samsung': 'Apple,Google',
-  'meta': 'Google,Microsoft',
-  'amazon': 'Flipkart,Microsoft',
-  'flipkart': 'Amazon,Microsoft',
-  'microsoft': 'Google,Amazon',
-  'google': 'Microsoft,Meta',
-  'netflix': 'Meta,Google',
-  'openai': 'Microsoft,Google',
-};
-
 export function WidgetCompetitorAnalysis() {
   const keyword = useAtomValue(keywordAtom);
   
-  // Dynamic competitor selection based on the keyword (case-insensitive)
-  const competitorString = React.useMemo(() => {
-    return COMPETITOR_MAP[keyword.toLowerCase()] || 'Meta,Google';
-  }, [keyword]);
-
-  const { data, loading } = useModuleData<CompData>('competitor', keyword, FALLBACK, { competitors: competitorString });
+  const { data, loading } = useModuleData<CompData>('competitor', keyword, FALLBACK, { competitors: 'auto' });
 
   const brands = data.brands.length > 0 ? data.brands : FALLBACK.brands;
   const [b0, b1, b2] = brands;

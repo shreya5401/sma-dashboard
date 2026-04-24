@@ -102,11 +102,22 @@ def api_monitoring(keyword: str = "Tesla", platform: str = "x", use_live: bool =
 @app.get("/api/competitor")
 def api_competitor(
     keyword: str = "Tesla",
-    competitors: str = "Ford,BMW",
+    competitors: str = "auto",
     platform: str = "x",
-    use_live: bool = True,
+    use_live: bool = False,
 ):
-    brands = [keyword] + [c.strip() for c in competitors.split(",") if c.strip()][:2]
+    from db import get_db
+    db = get_db()
+    
+    # If competitors is 'auto' or we are searching for something not in the hardcoded defaults
+    # we use the Cosine Similarity algorithm to find relevant brands from our DB
+    if competitors == "auto" or not competitors or competitors == "Ford,BMW":
+        all_brands = db["posts"].distinct("keyword")
+        discovered = competitor.find_competitors(keyword, all_brands)
+        brands = [keyword] + discovered
+    else:
+        brands = [keyword] + [c.strip() for c in competitors.split(",") if c.strip()][:2]
+
     brand_posts = {b: _posts(b, platform, use_live, limit=50) for b in brands}
     return {**competitor.analyze(brand_posts), "keyword": keyword}
 
