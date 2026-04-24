@@ -30,11 +30,11 @@ const COMPETITOR_MAP: Record<string, string> = {
   'samsung': 'Apple,Google',
   'meta': 'Google,Microsoft',
   'amazon': 'Flipkart,Microsoft',
+  'flipkart': 'Amazon,Microsoft',
+  'microsoft': 'Google,Amazon',
+  'google': 'Microsoft,Meta',
   'netflix': 'Meta,Google',
   'openai': 'Microsoft,Google',
-  'microsoft': 'Google,OpenAI',
-  'google': 'Meta,Microsoft',
-  'flipkart': 'Amazon,Samsung',
 };
 
 export function WidgetCompetitorAnalysis() {
