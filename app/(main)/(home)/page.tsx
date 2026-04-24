@@ -2,13 +2,13 @@
 
 import * as React from 'react';
 import { RiDashboard3Line, RiSearchLine } from '@remixicon/react';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 
 import * as Button from '@/components/ui/button';
 import * as Select from '@/components/ui/select';
 import Header from '@/components/header';
 
-import { keywordAtom, platformAtom } from '@/lib/atoms';
+import { keywordAtom, platformAtom, chatbotOpenAtom } from '@/lib/atoms';
 import { WidgetSentimentAnalysis } from '@/components/widgets/widget-sentiment-analysis';
 import { WidgetTrendingTopics } from '@/components/widgets/widget-trending-topics';
 import { WidgetNetworkAnalysis } from '@/components/widgets/widget-network-analysis';
@@ -26,6 +26,7 @@ export default function PageHome() {
   const [keyword, setKeyword] = useAtom(keywordAtom);
   const [platform, setPlatform] = useAtom(platformAtom);
   const [inputValue, setInputValue] = React.useState(keyword);
+  const setChatbotOpen = useSetAtom(chatbotOpenAtom);
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -54,6 +55,7 @@ export default function PageHome() {
               type='text'
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
+              onFocus={() => setChatbotOpen(false)}
               placeholder='Search keyword, hashtag, or brand…'
               className='w-full rounded-xl border border-stroke-soft-200 bg-bg-white-0 py-2.5 pl-9 pr-4 text-label-sm text-text-strong-950 placeholder:text-text-soft-400 focus:outline-none focus:ring-2 focus:ring-primary-base'
             />
