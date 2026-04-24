@@ -176,7 +176,7 @@ export default function ChatbotPopup() {
 
               {/* Suggestions Chips */}
               {messages.length === 1 && !isTyping && (
-                <div className="flex flex-wrap gap-2 pt-2">
+                <div className={`flex gap-2 pt-2 ${isExpanded ? 'flex-col items-start w-full' : 'flex-wrap'}`}>
                   {QUICK_SUGGESTIONS.map((s, i) => (
                     <motion.button
                       initial={{ opacity: 0, scale: 0.9 }}
@@ -184,7 +184,7 @@ export default function ChatbotPopup() {
                       transition={{ delay: i * 0.1 }}
                       key={i}
                       onClick={() => handleSend(s)}
-                      className="rounded-full border border-primary-soft-200 bg-primary-soft-100 px-4 py-2 text-xs font-medium text-primary-base hover:bg-primary-base hover:text-white transition-all"
+                      className={`rounded-full border border-primary-soft-200 bg-primary-soft-100 px-4 py-2 text-xs font-medium text-primary-base hover:bg-primary-base hover:text-white transition-all text-left ${isExpanded ? 'w-full max-w-[300px]' : ''}`}
                     >
                       {s}
                     </motion.button>
