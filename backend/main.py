@@ -11,7 +11,7 @@ from data_fetcher import fetch_posts
 from models import (
     sentiment, trending, network, recommendation,
     fake_news, segmentation, data_viz, ad_campaign,
-    influencer, monitoring, competitor, prediction,
+    influencer, monitoring, competitor, prediction, chatbot,
 )
 
 app = FastAPI(title="Social Media Analytics API", version="1.0.0")
@@ -115,6 +115,12 @@ def api_competitor(
 def api_prediction(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**prediction.analyze(posts), "keyword": keyword}
+
+
+@app.post("/api/chat")
+def api_chat(data: dict):
+    message = data.get("message", "")
+    return {"response": chatbot.get_chat_response(message)}
 
 
 @app.get("/api/posts")
