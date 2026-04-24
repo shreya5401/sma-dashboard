@@ -16,18 +16,32 @@ _db_lock = threading.Lock()
 
 def get_db():
     global _db
-    if _db is not None:  # fast path — no lock needed once connected
+    if _db is not None:
         return _db
     if not MONGODB_URI:
+        print("[DB] MONGODB_URI not found in environment")
         return None
-    with _db_lock:  # only one thread connects; others wait then hit the fast path
+    with _db_lock:
         if _db is not None:
             return _db
         try:
             from pymongo import MongoClient, ASCENDING, DESCENDING
-            client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=3000)
+            from pymongo.errors import ConnectionFailure
+            
+            # Default to 'sma_db' if no DB name in URI
+            db_name = "sma_db"
+            if "/" in MONGODB_URI.split("://")[-1]:
+                parts = MONGODB_URI.split("/")
+                if len(parts) > 3:
+                    path = parts[3].split("?")[0]
+                    if path:
+                        db_name = path
+
+            client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
             client.admin.command("ping")
-            _db = client["sma_db"]
+            _db = client[db_name]
+            
+            # Ensure indexes
             _db["posts"].create_index(
                 [("post_id", ASCENDING), ("platform", ASCENDING)], unique=True
             )
@@ -37,7 +51,10 @@ def get_db():
             _db["scrape_sessions"].create_index(
                 [("keyword", ASCENDING), ("platform", ASCENDING), ("fetched_at", DESCENDING)]
             )
-            print("[DB] Connected to MongoDB")
+            print(f"[DB] Connected to MongoDB (Database: {db_name})")
+        except ConnectionFailure as e:
+            print(f"[DB] MongoDB connection failed (Connection Error): {e}")
+            _db = None
         except Exception as e:
             print(f"[DB] MongoDB connection failed: {e}")
             _db = None
