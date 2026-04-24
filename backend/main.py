@@ -109,9 +109,11 @@ def api_competitor(
     from db import get_db
     db = get_db()
     
+    # Fallback to defaults if DB is unreachable
+    if db is None:
+        brands = [keyword] + ["Meta", "Google"]
     # If competitors is 'auto' or we are searching for something not in the hardcoded defaults
-    # we use the Cosine Similarity algorithm to find relevant brands from our DB
-    if competitors == "auto" or not competitors or competitors == "Ford,BMW":
+    elif competitors == "auto" or not competitors or competitors == "Ford,BMW":
         all_brands = db["posts"].distinct("keyword")
         discovered = competitor.find_competitors(keyword, all_brands)
         brands = [keyword] + discovered
@@ -131,7 +133,38 @@ def api_prediction(keyword: str = "Tesla", platform: str = "x", use_live: bool =
 @app.post("/api/chat")
 def api_chat(data: dict):
     message = data.get("message", "")
-    return {"response": chatbot.get_chat_response(message)}
+    context = data.get("context", {})
+    keyword = context.get("keyword", "the current brand")
+    
+    # 1. Fetch live stats for the AI to use
+    from data_fetcher import fetch_posts
+    posts = fetch_posts(keyword, use_live=False) # Fast fetch from DB/CSV
+    
+    live_stats = "No live data available."
+    if posts:
+        avg_likes = sum(p.get("likes", 0) for p in posts) / len(posts)
+        hashtags = [h for p in posts for h in p.get("hashtags", [])]
+        top_h = sorted(set(hashtags), key=hashtags.count, reverse=True)[:3]
+        
+        # Simple sentiment mock/calc
+        pos = len([p for p in posts if p.get("likes", 0) > 500]) # Example proxy
+        live_stats = f"Avg Likes: {avg_likes:.1f}, Top Hashtags: {', '.join(top_h)}, High Engagement Posts: {pos}"
+
+    # 2. Dynamically find competitors
+    from db import get_db
+    from models import competitor
+    db = get_db()
+    discovered = ["rival brands"]
+    if db:
+        all_brands = db["posts"].distinct("keyword")
+        discovered = competitor.find_competitors(keyword, all_brands)
+    
+    return {"response": chatbot.get_chat_response(
+        message, 
+        keyword=keyword, 
+        competitors=", ".join(discovered),
+        live_stats=live_stats
+    )}
 
 
 @app.get("/api/posts")

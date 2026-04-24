@@ -1,5 +1,7 @@
 'use client';
 
+import ReactMarkdown from 'react-markdown';
+
 import * as React from 'react';
 import { RiChat3Line, RiCloseLine, RiRobotLine, RiSendPlane2Line, RiExpandDiagonalLine, RiCollapseDiagonalLine } from '@remixicon/react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -99,7 +101,7 @@ export default function ChatbotPopup() {
               opacity: 1, 
               y: 0, 
               scale: 1,
-              width: isExpanded ? '500px' : '400px',
+              width: isExpanded ? '600px' : '400px',
               height: isExpanded ? '800px' : '600px',
               maxHeight: 'calc(100vh - 100px)'
             }}
@@ -151,12 +153,23 @@ export default function ChatbotPopup() {
                   key={i} 
                   className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className={`max-w-[85%] rounded-2xl px-5 py-3 text-label-md leading-relaxed shadow-sm ${
+                  <div className={`max-w-[90%] rounded-2xl px-5 py-3 text-label-md leading-relaxed shadow-sm ${
                     m.role === 'user' 
                       ? 'bg-primary-base text-white rounded-br-none' 
-                      : 'bg-bg-white-0 text-text-strong-950 rounded-bl-none'
+                      : 'bg-bg-white-0 text-text-strong-950 rounded-bl-none prose prose-sm prose-slate max-w-none'
                   }`}>
-                    {m.text}
+                    {m.role === 'bot' ? (
+                      <ReactMarkdown 
+                        components={{
+                          h1: ({node, ...props}) => <h1 className="text-title-h6 font-bold mb-2 mt-1" {...props} />,
+                          h2: ({node, ...props}) => <h2 className="text-label-md font-bold mb-1.5 mt-3" {...props} />,
+                          ul: ({node, ...props}) => <ul className="list-disc ml-4 space-y-1 mb-2" {...props} />,
+                          p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                        }}
+                      >
+                        {m.text}
+                      </ReactMarkdown>
+                    ) : m.text}
                   </div>
                 </motion.div>
               ))}

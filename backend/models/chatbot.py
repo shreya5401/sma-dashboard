@@ -4,11 +4,21 @@ from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
+# Also look in the same directory as this file
+current_dir = os.path.dirname(os.path.abspath(__file__))
+env_path = os.path.join(current_dir, "../../.env") # If in models/
+load_dotenv(env_path)
+env_path_v2 = os.path.join(current_dir, "../.env") # If in backend/
+load_dotenv(env_path_v2)
 
 # Initialize Groq client
 client = None
-if os.getenv("GROQ_API_KEY"):
-    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+api_key = os.getenv("GROQ_API_KEY")
+if api_key:
+    print(f"[Chatbot] Groq API Key found. Initializing client...")
+    client = Groq(api_key=api_key)
+else:
+    print(f"[Chatbot] WARNING: GROQ_API_KEY not found in environment.")
 
 # Technical definitions for core metrics
 CONCEPT_DEFINITIONS = {
@@ -41,9 +51,9 @@ You are the SMA (Social Media Analytics) Assistant, a premium AI expert.
 You help users understand their marketing dashboard which has 12 specialized modules.
 
 CONTEXT:
-- The dashboard supports brands like Tesla, Apple, Samsung, Google, Meta, Microsoft, Amazon, Netflix, and OpenAI.
-- If a user searches for a brand, all modules update instantly.
-- We use advanced algorithms like VADER for sentiment, K-Means for clustering, Cosine Similarity for competitors, and Random Forest for prediction.
+- The dashboard supports Brands, Public Figures, and Celebrities (e.g., Tesla, Apple, Elon Musk, Narendra Modi, etc.).
+- If a user searches for a brand or person, all modules update instantly.
+- We use advanced algorithms like VADER for sentiment, K-Means for clustering, Cosine Similarity for competitors/peers, and Random Forest for prediction.
 
 MODULES:
 {chr(10).join([f"- {v}" for v in SMA_KNOWLEDGE.values()])}
@@ -51,28 +61,56 @@ MODULES:
 CORE CONCEPTS:
 {chr(10).join([f"- {k.upper()}: {v}" for k, v in CONCEPT_DEFINITIONS.items()])}
 
+FORMATTING RULES:
+1. ALWAYS use standard ATX-style Markdown headers (e.g., # Header 1, ## Header 2).
+2. NEVER use 'Setext' style headers (NEVER underline titles with '====' or '----').
+3. Use bold **text** for key terms and brand names.
+4. Use bulleted lists for technical features.
+5. Ensure there is a blank line before and after every header.
+6. If mentioning the current brand (e.g. Tesla), always bold it like **Tesla**.
+
+CONCISENESS RULES:
+1. Keep your opening summary of the brand to exactly 1-2 sentences.
+2. For each module, provide exactly 1-2 lines of insight using the LIVE STATS provided.
+3. COMPLETENESS: If asked for a 'Full Summary' or 'All Modules', you MUST list all 12 modules (1 through 12). DO NOT SKIP ANY.
+4. If a response is very long, ensure it is well-structured with clear headers so the user can scroll through it.
+
 GUIDELINES:
 1. Be professional, technical yet accessible, and helpful.
-2. If asked about a module (e.g. 'Module 8'), explain it using the context above.
-3. If asked about a concept (e.g. 'What is ROI?'), give a clear definition first, then explain how it fits into the dashboard.
-4. For single-word queries like 'Elon' or 'Modi', suggest using the search bar for a full 12-module analysis.
-5. Use markdown for better readability.
+2. ALWAYS acknowledge the current brand being analyzed (provided in context) in your opening sentence.
+3. If asked about a module (e.g. 'Module 8'), explain it using the context above.
+4. If asked about a concept (e.g. 'What is ROI?'), give a clear definition first, then explain how it fits into the dashboard.
+5. Keep your tone 'Premium' and 'Expert'.
+6. Use markdown for better readability.
 """
 
-def get_chat_response(message: str) -> str:
+def get_chat_response(message: str, keyword: str = "the dashboard", competitors: str = "rival brands", live_stats: str = "N/A") -> str:
     msg = message.lower()
     
     # 1. Try Groq LLM first
     if client:
         try:
+            # Custom prompt extension with LIVE DATA
+            contextual_instruction = f"""
+CURRENT DASHBOARD CONTEXT:
+- Brand/Person: '{keyword}'
+- Identified Competitors: {competitors}
+- LIVE STATS FROM DASHBOARD: {live_stats}
+
+INSTRUCTION: 
+1. Start with 1-2 sentences about {keyword}.
+2. If a full overview is requested, list ALL 12 modules with 1-2 lines of actual data-driven insight for each. 
+3. DO NOT cut off the response; ensure you reach Module 12.
+"""
+            
             completion = client.chat.completions.create(
                 model="llama-3.1-8b-instant",
                 messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "system", "content": SYSTEM_PROMPT + contextual_instruction},
                     {"role": "user", "content": message}
                 ],
                 temperature=0.7,
-                max_tokens=500,
+                max_tokens=1500,
             )
             return completion.choices[0].message.content
         except Exception as e:
