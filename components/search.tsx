@@ -14,6 +14,7 @@ import {
   RiSparklingLine,
 } from '@remixicon/react';
 import { atom, useAtom, useSetAtom } from 'jotai';
+import { chatbotOpenAtom } from '@/lib/atoms';
 
 import { cn } from '@/utils/cn';
 import * as CommandMenu from '@/components/ui/command-menu';
@@ -31,10 +32,17 @@ export function SearchMenuButton({
   ...rest
 }: React.ComponentPropsWithoutRef<typeof TopbarItemButton.Root>) {
   const setOpen = useSetAtom(isCommandMenuOpen);
+  const setChatbotOpen = useSetAtom(chatbotOpenAtom);
 
   return (
     <>
-      <TopbarItemButton.Root onClick={() => setOpen(true)} {...rest}>
+      <TopbarItemButton.Root 
+        onClick={() => {
+          setOpen(true);
+          setChatbotOpen(false);
+        }} 
+        {...rest}
+      >
         <TopbarItemButton.Icon as={RiSearch2Line} />
       </TopbarItemButton.Root>
     </>
@@ -43,12 +51,17 @@ export function SearchMenuButton({
 
 export function SearchMenu() {
   const [open, setOpen] = useAtom(isCommandMenuOpen);
+  const setChatbotOpen = useSetAtom(chatbotOpenAtom);
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen((open) => {
+          const next = !open;
+          if (next) setChatbotOpen(false);
+          return next;
+        });
       }
     };
 

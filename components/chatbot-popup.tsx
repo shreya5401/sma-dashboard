@@ -5,8 +5,8 @@ import ReactMarkdown from 'react-markdown';
 import * as React from 'react';
 import { RiChat3Line, RiCloseLine, RiRobotLine, RiSendPlane2Line, RiExpandDiagonalLine, RiCollapseDiagonalLine } from '@remixicon/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAtomValue } from 'jotai';
-import { keywordAtom } from '@/lib/atoms';
+import { keywordAtom, chatbotOpenAtom } from '@/lib/atoms';
+import { useAtom, useAtomValue } from 'jotai';
 
 const QUICK_SUGGESTIONS = [
   "How does this dashboard work?",
@@ -19,7 +19,7 @@ const QUICK_SUGGESTIONS = [
 ];
 
 export default function ChatbotPopup() {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useAtom(chatbotOpenAtom);
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [showGreeting, setShowGreeting] = React.useState(false);
   const [messages, setMessages] = React.useState<{ role: 'user' | 'bot'; text: string }[]>([
