@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { RiBarChartLine } from '@remixicon/react';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useAtomValue } from 'jotai';
@@ -18,48 +19,124 @@ const FALLBACK: CompData = {
   metrics: [
     { metric: 'Growth', brand: 34, compA: 28, compB: 19 },
     { metric: 'Engagement', brand: 62, compA: 48, compB: 55 },
-    { metric: 'Reach', brand: 78, compA: 82, compB: 61 },
-    { metric: 'Sentiment', brand: 71, compA: 59, compB: 66 },
+    { metric: 'Strategy', brand: 75, compA: 60, compB: 65 },
   ],
-  summary: 'Your brand leads in Growth & Sentiment',
+  summary: 'Your brand leads in Strategy & Growth',
 };
 
 export function WidgetCompetitorAnalysis() {
   const keyword = useAtomValue(keywordAtom);
-  const { data, loading } = useModuleData<CompData>('competitor', keyword, FALLBACK, { competitors: 'Ford,BMW' });
+  
+  const { data, loading } = useModuleData<CompData>('competitor', keyword, FALLBACK, { competitors: 'auto' });
 
-  const [b0, b1, b2] = data.brands.length > 0 ? data.brands : FALLBACK.brands;
+  const brands = data.brands.length > 0 ? data.brands : FALLBACK.brands;
+  const [b0, b1, b2] = brands;
+
+  const handleDetails = () => {
+    alert(`Showing detailed analysis for: ${brands.join(', ')}\n\nKeyword: ${keyword}`);
+  };
 
   return (
-    <div className='relative flex w-full flex-col gap-5 rounded-2xl bg-bg-white-0 p-5 shadow-regular-xs ring-1 ring-inset ring-stroke-soft-200'>
+    <div className='relative flex w-full flex-col gap-6 rounded-2xl bg-bg-white-0 p-6 shadow-regular-sm ring-1 ring-inset ring-stroke-soft-200 transition-all hover:shadow-regular-md'>
       {loading && <LoadingOverlay />}
-      <div className='flex items-start gap-2'>
-        <div className='flex-1'>
-          <div className='text-label-sm text-text-sub-600'>Module 11 · Competitor Analysis</div>
-          <div className='mt-1 flex items-center gap-2'>
-            <div className='text-title-h5 text-text-strong-950'>{data.brands.length || 3} Brands Compared</div>
-            <Badge.Root variant='light' color='blue' size='medium'>Strategy</Badge.Root>
+      
+      <div className='flex items-start justify-between gap-4'>
+        <div className='flex flex-col gap-1'>
+          <div className='flex items-center gap-2'>
+            <span className='text-label-sm font-medium uppercase tracking-wider text-text-sub-600'>Competitor Analysis</span>
+            <div className='size-1.5 rounded-full bg-success-base animate-pulse' />
+          </div>
+          <div className='flex items-center gap-2'>
+            <h3 className='text-title-h5 font-bold text-text-strong-950'>{brands.length} Brands Compared</h3>
+            <Badge.Root variant='light' color='blue' size='xsmall' className='font-semibold'>Benchmark</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <Button.Root variant='neutral' mode='stroke' size='xxsmall' className='rounded-lg px-3 hover:bg-bg-soft-200' onClick={handleDetails}>
+          Details
+        </Button.Root>
       </div>
 
-      <ResponsiveContainer width='100%' height={180}>
-        <BarChart data={data.metrics} margin={{ top: 4, right: 4, left: -16, bottom: 4 }} barCategoryGap='30%'>
-          <CartesianGrid strokeDasharray='4 4' className='stroke-stroke-soft-200' vertical={false} />
-          <XAxis dataKey='metric' tick={{ fontSize: 11, fill: 'hsl(var(--text-soft-400))' }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--text-soft-400))' }} axisLine={false} tickLine={false} unit='%' />
-          <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px' }} formatter={(v: number, n: string) => [`${v}%`, n === 'brand' ? b0 : n === 'compA' ? b1 : b2]} />
-          <Legend formatter={(v) => v === 'brand' ? b0 : v === 'compA' ? b1 : b2} wrapperStyle={{ fontSize: '11px' }} />
-          <Bar dataKey='brand' fill='hsl(var(--primary-base))' radius={[4, 4, 0, 0]} />
-          <Bar dataKey='compA' fill='#f59e0b' radius={[4, 4, 0, 0]} />
-          <Bar dataKey='compB' fill='#94a3b8' radius={[4, 4, 0, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
+      <div className='h-[200px] w-full'>
+        <ResponsiveContainer width='100%' height='100%'>
+          <BarChart data={data.metrics} margin={{ top: 10, right: 10, left: -20, bottom: 0 }} barGap={8} barCategoryGap='25%'>
+            <defs>
+              <linearGradient id="colorBrand" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="hsl(var(--primary-base))" stopOpacity={0.9}/>
+                <stop offset="95%" stopColor="hsl(var(--primary-base))" stopOpacity={0.4}/>
+              </linearGradient>
+              <linearGradient id="colorCompA" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.9}/>
+                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.4}/>
+              </linearGradient>
+              <linearGradient id="colorCompB" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.9}/>
+                <stop offset="95%" stopColor="#94a3b8" stopOpacity={0.4}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray='3 3' className='stroke-stroke-soft-200' vertical={false} />
+            <XAxis 
+              dataKey='metric' 
+              tick={{ fontSize: 12, fontWeight: 500, fill: 'hsl(var(--text-soft-400))' }} 
+              axisLine={false} 
+              tickLine={false} 
+              dy={10}
+            />
+            <YAxis 
+              tick={{ fontSize: 11, fill: 'hsl(var(--text-soft-400))' }} 
+              axisLine={false} 
+              tickLine={false} 
+              unit='%' 
+              domain={[0, 100]}
+            />
+            <Tooltip 
+              cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <div className="flex flex-col gap-2 rounded-xl border border-stroke-soft-200 bg-bg-white-0 p-3 shadow-xl backdrop-blur-md">
+                      <p className="text-label-sm font-bold text-text-strong-950">{label}</p>
+                      <div className="flex flex-col gap-1.5">
+                        {payload.map((p, i) => (
+                          <div key={i} className="flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-1.5">
+                              <div className="size-2 rounded-full" style={{ backgroundColor: p.color }} />
+                              <span className="text-[11px] text-text-sub-600">
+                                {p.name === 'brand' ? b0 : p.name === 'compA' ? b1 : b2}
+                              </span>
+                            </div>
+                            <span className="text-[11px] font-bold text-text-strong-950">{p.value}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
+            <Legend 
+              verticalAlign="top" 
+              align="right" 
+              iconType="circle"
+              iconSize={8}
+              formatter={(v) => <span className='text-[11px] font-medium text-text-sub-600'>{v === 'brand' ? b0 : v === 'compA' ? b1 : b2}</span>} 
+              wrapperStyle={{ paddingTop: '0px', paddingBottom: '20px' }}
+            />
+            <Bar dataKey='brand' name="brand" fill='url(#colorBrand)' radius={[6, 6, 0, 0]} animationDuration={1500} />
+            <Bar dataKey='compA' name="compA" fill='url(#colorCompA)' radius={[6, 6, 0, 0]} animationDuration={1500} />
+            <Bar dataKey='compB' name="compB" fill='url(#colorCompB)' radius={[6, 6, 0, 0]} animationDuration={1500} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
 
-      <div className='flex items-center gap-1.5'>
-        <RiBarChartLine className='size-4 text-text-soft-400' />
-        <span className='text-paragraph-sm text-text-sub-600'>{data.summary}</span>
+      <div className='flex items-center gap-2 rounded-xl bg-bg-soft-200 p-3'>
+        <div className='flex size-8 items-center justify-center rounded-lg bg-bg-white-0 shadow-sm'>
+          <RiBarChartLine className='size-4 text-primary-base' />
+        </div>
+        <div className='flex flex-col'>
+          <span className='text-paragraph-xs font-medium text-text-sub-600'>AI Insight</span>
+          <span className='text-paragraph-sm font-semibold text-text-strong-950'>{data.summary}</span>
+        </div>
       </div>
     </div>
   );

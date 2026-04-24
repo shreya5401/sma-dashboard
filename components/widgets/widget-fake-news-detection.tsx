@@ -14,6 +14,22 @@ type FakeNewsData = { total: number; real: number; fake: number; real_count?: nu
 
 const FALLBACK: FakeNewsData = { total: 0, real: 73, fake: 27, accuracy: 91.4 };
 
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const entry = payload[0];
+    return (
+      <div className="rounded-xl border border-white/10 bg-black/60 p-3 shadow-regular-md backdrop-blur-md">
+        <p className="mb-1 text-label-xs font-bold text-white/50 uppercase tracking-wider">{entry.name} News</p>
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-label-sm text-white/70">Share</span>
+          <span className="text-label-sm font-bold" style={{ color: entry.payload.color }}>{entry.value}%</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export function WidgetFakeNewsDetection() {
   const keyword = useAtomValue(keywordAtom);
   const { data, loading } = useModuleData<FakeNewsData>('fake-news', keyword, FALLBACK);
@@ -39,10 +55,13 @@ export function WidgetFakeNewsDetection() {
 
       <ResponsiveContainer width='100%' height={130}>
         <PieChart>
-          <Pie data={chartData} cx='50%' cy='50%' innerRadius={38} outerRadius={58} paddingAngle={4} dataKey='value'>
+          <Pie data={chartData} cx='50%' cy='50%' innerRadius={38} outerRadius={58} paddingAngle={4} dataKey='value' stroke='none'>
             {chartData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
           </Pie>
-          <Tooltip formatter={(v: number) => [`${v}%`, '']} contentStyle={{ borderRadius: '8px', fontSize: '12px' }} />
+          <Tooltip 
+            content={<CustomTooltip />} 
+            wrapperStyle={{ outline: 'none' }}
+          />
         </PieChart>
       </ResponsiveContainer>
 
