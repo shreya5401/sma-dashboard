@@ -6,6 +6,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAtomValue } from 'jotai';
 import { keywordAtom } from '@/lib/atoms';
 
+const QUICK_SUGGESTIONS = [
+  "How does this dashboard work?",
+  "Analyze Module 11 (Competitors)",
+  "What is ROI in Module 8?",
+  "Tell me about Fake News Detection",
+  "Who are the top influencers?",
+  "Which brands can I search for?",
+  "I want to ask something else..."
+];
+
 export default function ChatbotPopup() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [showGreeting, setShowGreeting] = React.useState(false);
@@ -18,12 +28,10 @@ export default function ChatbotPopup() {
   const keyword = useAtomValue(keywordAtom);
 
   React.useEffect(() => {
-    // Show greeting bubble after 3 seconds
     const timer = setTimeout(() => {
       if (!isOpen) setShowGreeting(true);
     }, 3000);
 
-    // Hide greeting bubble after 8 seconds
     const hideTimer = setTimeout(() => {
       setShowGreeting(false);
     }, 11000);
@@ -40,11 +48,10 @@ export default function ChatbotPopup() {
     }
   }, [messages, isTyping]);
 
-  const handleSend = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!input.trim() || isTyping) return;
+  const handleSend = async (messageText: string) => {
+    const userMsg = messageText.trim();
+    if (!userMsg || isTyping) return;
 
-    const userMsg = input.trim();
     setInput('');
     setMessages((prev) => [...prev, { role: 'user', text: userMsg }]);
     setIsTyping(true);
@@ -76,9 +83,9 @@ export default function ChatbotPopup() {
             initial={{ opacity: 0, x: 20, scale: 0.8 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 20, scale: 0.8 }}
-            className="mb-1 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-4 py-2 shadow-regular-md"
+            className="mb-1 rounded-2xl border border-stroke-soft-200 bg-bg-white-0 px-5 py-3 shadow-regular-md"
           >
-            <p className="text-paragraph-xs font-semibold text-text-strong-950">
+            <p className="text-label-sm font-semibold text-text-strong-950">
               👋 Need help with your analytics?
             </p>
           </motion.div>
@@ -89,50 +96,74 @@ export default function ChatbotPopup() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="flex h-[500px] w-[360px] flex-col overflow-hidden rounded-2xl border border-stroke-soft-200 bg-bg-white-0 shadow-regular-lg ring-1 ring-inset ring-stroke-soft-200"
+            className="flex h-[600px] w-[400px] flex-col overflow-hidden rounded-3xl border border-stroke-soft-200 bg-bg-white-0 shadow-regular-xl ring-1 ring-inset ring-stroke-soft-200"
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-stroke-soft-200 bg-bg-soft-200 p-4">
-              <div className="flex items-center gap-2">
-                <div className="flex size-8 items-center justify-center rounded-full bg-primary-base">
-                  <RiRobotLine className="size-4 text-white" />
+            <div className="flex items-center justify-between border-b border-stroke-soft-200 bg-bg-soft-200 px-6 py-5">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-full bg-primary-base">
+                  <RiRobotLine className="size-5 text-white" />
                 </div>
                 <div>
-                  <h4 className="text-label-sm font-bold text-text-strong-950">SMA Assistant</h4>
-                  <div className="flex items-center gap-1">
-                    <div className="size-1.5 rounded-full bg-success-base animate-pulse" />
-                    <span className="text-[10px] font-medium text-text-sub-600">Online</span>
+                  <h4 className="text-label-md font-bold text-text-strong-950">SMA Assistant</h4>
+                  <div className="flex items-center gap-1.5">
+                    <div className="size-2 rounded-full bg-success-base animate-pulse" />
+                    <span className="text-xs font-medium text-text-sub-600">Online</span>
                   </div>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="rounded-lg p-1 hover:bg-bg-white-0">
-                <RiCloseLine className="size-5 text-text-soft-400" />
+              <button onClick={() => setIsOpen(false)} className="rounded-xl p-2 hover:bg-bg-white-0 transition-colors">
+                <RiCloseLine className="size-6 text-text-soft-400" />
               </button>
             </div>
 
             {/* Messages */}
             <div 
               ref={scrollRef}
-              className="flex-1 overflow-y-auto bg-bg-soft-200/50 p-4 space-y-4"
+              className="flex-1 overflow-y-auto bg-bg-soft-200/50 p-6 space-y-5"
             >
               {messages.map((m, i) => (
-                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-paragraph-sm shadow-sm ${
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  key={i} 
+                  className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div className={`max-w-[85%] rounded-2xl px-5 py-3 text-label-md leading-relaxed shadow-sm ${
                     m.role === 'user' 
                       ? 'bg-primary-base text-white rounded-br-none' 
-                      : 'bg-bg-white-0 text-text-sub-600 rounded-bl-none'
+                      : 'bg-bg-white-0 text-text-strong-950 rounded-bl-none'
                   }`}>
                     {m.text}
                   </div>
-                </div>
+                </motion.div>
               ))}
+
+              {/* Suggestions Chips */}
+              {messages.length === 1 && !isTyping && (
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {QUICK_SUGGESTIONS.map((s, i) => (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.1 }}
+                      key={i}
+                      onClick={() => handleSend(s)}
+                      className="rounded-full border border-primary-soft-200 bg-primary-soft-100 px-4 py-2 text-xs font-medium text-primary-base hover:bg-primary-base hover:text-white transition-all"
+                    >
+                      {s}
+                    </motion.button>
+                  ))}
+                </div>
+              )}
+
               {isTyping && (
                 <div className="flex justify-start">
-                  <div className="bg-bg-white-0 rounded-2xl rounded-bl-none px-4 py-2 shadow-sm">
-                    <div className="flex gap-1">
-                      <div className="size-1.5 rounded-full bg-text-soft-400 animate-bounce" />
-                      <div className="size-1.5 rounded-full bg-text-soft-400 animate-bounce [animation-delay:0.2s]" />
-                      <div className="size-1.5 rounded-full bg-text-soft-400 animate-bounce [animation-delay:0.4s]" />
+                  <div className="bg-bg-white-0 rounded-2xl rounded-bl-none px-5 py-3 shadow-sm">
+                    <div className="flex gap-1.5">
+                      <div className="size-2 rounded-full bg-text-soft-400 animate-bounce" />
+                      <div className="size-2 rounded-full bg-text-soft-400 animate-bounce [animation-delay:0.2s]" />
+                      <div className="size-2 rounded-full bg-text-soft-400 animate-bounce [animation-delay:0.4s]" />
                     </div>
                   </div>
                 </div>
@@ -140,21 +171,24 @@ export default function ChatbotPopup() {
             </div>
 
             {/* Input */}
-            <form onSubmit={handleSend} className="border-t border-stroke-soft-200 bg-bg-white-0 p-4">
+            <form 
+              onSubmit={(e) => { e.preventDefault(); handleSend(input); }} 
+              className="border-t border-stroke-soft-200 bg-bg-white-0 p-6"
+            >
               <div className="relative">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about analytics..."
-                  className="w-full rounded-xl border border-stroke-soft-200 bg-bg-soft-200 py-2.5 pl-4 pr-10 text-label-sm text-text-strong-950 placeholder:text-text-soft-400 focus:outline-none focus:ring-2 focus:ring-primary-base"
+                  className="w-full rounded-2xl border border-stroke-soft-200 bg-bg-soft-200 py-3.5 pl-5 pr-12 text-label-md text-text-strong-950 placeholder:text-text-soft-400 focus:outline-none focus:ring-2 focus:ring-primary-base transition-all"
                 />
                 <button 
                   type="submit"
                   disabled={!input.trim() || isTyping}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-primary-base hover:bg-bg-white-0 disabled:text-text-soft-400"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-xl p-2 text-primary-base hover:bg-bg-white-0 disabled:text-text-soft-400 transition-colors"
                 >
-                  <RiSendPlane2Line className="size-5" />
+                  <RiSendPlane2Line className="size-6" />
                 </button>
               </div>
             </form>

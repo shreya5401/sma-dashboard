@@ -44,10 +44,16 @@ def get_chat_response(message: str) -> str:
     if "segment" in msg or "cluster" in msg:
         return f"Module 6 (User Segmentation) {SMA_KNOWLEDGE[6]}"
 
+    if "influencer" in msg:
+        return f"Module 9 (Influencer Detection) {SMA_KNOWLEDGE[9]}"
+
     if "predict" in msg or "future" in msg:
         return f"Module 12 (Popularity Prediction) {SMA_KNOWLEDGE[12]}"
 
     if "brand" in msg or "search" in msg:
         return "You can search for: Tesla, Apple, Samsung, Google, Meta, Microsoft, Amazon, Netflix, or OpenAI."
+
+    if "something else" in msg:
+        return "Sure! Feel free to type any question in the chat box below. I can help with analytics, specific modules, or brand comparisons."
 
     return "I can explain any of our 12 modules (just ask for 'Module 11' etc.), help with ROI, or show you how to search for brands. What's on your mind?"

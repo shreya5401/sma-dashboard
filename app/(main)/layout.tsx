@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic';
 
 import HeaderMobile from '@/components/header-mobile';
 import Sidebar from '@/components/sidebar';
+import ChatbotPopup from '@/components/chatbot-popup';
 
 const DynamicSettingsModal = dynamic(
   () => import('@/components/settings-modal'),
@@ -26,6 +27,7 @@ export default function Layout({
       </div>
 
       <DynamicSettingsModal />
+      <ChatbotPopup />
     </>
   );
 }
