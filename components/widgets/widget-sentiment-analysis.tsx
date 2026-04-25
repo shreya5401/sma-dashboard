@@ -9,6 +9,7 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 
 type SentimentData = { total: number; positive: number; negative: number; neutral: number; dominant: string };
 
@@ -53,7 +54,12 @@ export function WidgetSentimentAnalysis() {
             <Badge.Root variant='light' color='green' size='medium'>NLP</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <WidgetDetailsModal 
+          title="Sentiment Analysis" 
+          moduleNumber="Module 1" 
+          description="Granular emotional mapping using deep learning transformers. Analyzes text for positive, negative, and neutral bias to determine overall audience mood."
+          data={{ total_posts: data.total, dominant: data.dominant }}
+        />
       </div>
 
       <ResponsiveContainer width='100%' height={140}>

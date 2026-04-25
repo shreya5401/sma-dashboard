@@ -9,6 +9,7 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 
 type TrendingData = { hashtags: { tag: string; count: number }[]; total_unique: number; top_tag: string; top_count: number };
 
@@ -54,7 +55,12 @@ export function WidgetTrendingTopics() {
             <Badge.Root variant='light' color='blue' size='medium'>{data.top_count} mentions</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <WidgetDetailsModal 
+          title="Trending Topics Detection" 
+          moduleNumber="Module 2" 
+          description="Real-time topic extraction and momentum tracking. Identifies emerging discussions and viral hashtags through latent Dirichlet allocation (LDA)."
+          data={{ top_tag: data.top_tag, unique_tags: data.total_unique }}
+        />
       </div>
 
       <ResponsiveContainer width='100%' height={160}>

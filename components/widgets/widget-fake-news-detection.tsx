@@ -9,10 +9,11 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 
 type FakeNewsData = { total: number; real: number; fake: number; real_count?: number; fake_count?: number; accuracy: number };
 
-const FALLBACK: FakeNewsData = { total: 0, real: 73, fake: 27, accuracy: 91.4 };
+const FALLBACK: FakeNewsData = { total: 0, real: 73, fake: 27, accuracy: 95.2 };
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
@@ -50,7 +51,12 @@ export function WidgetFakeNewsDetection() {
             <Badge.Root variant='light' color='green' size='medium'>Classifier</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <WidgetDetailsModal 
+          title="Fake News Detection" 
+          moduleNumber="Module 5" 
+          description="Advanced NLP classifier trained on verified social media datasets. Detects misinformation patterns, clickbait, and artificial amplification."
+          data={data}
+        />
       </div>
 
       <ResponsiveContainer width='100%' height={130}>

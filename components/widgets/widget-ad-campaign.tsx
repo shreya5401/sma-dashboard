@@ -9,6 +9,7 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 
 type WeekRow = { name: string; ctr: number; conv: number; roi: number };
 type AdData = { ctr: number; conversion_rate: number; roi: number; weekly: WeekRow[] };
@@ -63,7 +64,12 @@ export function WidgetAdCampaign() {
             <Badge.Root variant='light' color='green' size='medium'>Active</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <WidgetDetailsModal 
+          title="Ad Campaign Optimization" 
+          moduleNumber="Module 8" 
+          description="Predictive modeling for ad spend efficiency. Analyzes CTR and conversion trends to maximize ROI through automated budget reallocation."
+          data={{ ctr: data.ctr, conversion: data.conversion_rate, roi: data.roi }}
+        />
       </div>
 
       <div className='grid grid-cols-3 gap-3'>

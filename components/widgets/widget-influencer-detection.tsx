@@ -8,6 +8,7 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 
 type Influencer = { rank: number; name: string; followers: string; score: number; delta: string };
 type InfluencerData = { influencers: Influencer[] };
@@ -42,7 +43,12 @@ export function WidgetInfluencerDetection() {
             <Badge.Root variant='light' color='yellow' size='medium'>Score {top?.score ?? '—'}</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <WidgetDetailsModal 
+          title="Influencer Detection" 
+          moduleNumber="Module 9" 
+          description="Identification of high-impact accounts using centrality measures. Analyzes reach, engagement depth, and topical authority to map influence networks."
+          data={{ top_influencer: top?.name, influencer_count: list.length }}
+        />
       </div>
 
       <div className='flex flex-col gap-2'>

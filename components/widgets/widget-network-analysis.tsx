@@ -9,6 +9,7 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 
 type NetworkData = { total_nodes: number; total_edges: number; communities: number; influencers: number; connectors: number };
 
@@ -36,7 +37,12 @@ export function WidgetNetworkAnalysis() {
             <Badge.Root variant='light' color='purple' size='medium'>NetworkX</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <WidgetDetailsModal 
+          title="Network Analysis" 
+          moduleNumber="Module 3" 
+          description="Graph-based visualization of community structures. Detects information hubs, bridging nodes, and isolated clusters within the social graph."
+          data={{ nodes: data.total_nodes, edges: data.total_edges, communities: data.communities }}
+        />
       </div>
 
       <ResponsiveContainer width='100%' height={140}>

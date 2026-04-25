@@ -9,6 +9,7 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 
 type Cluster = { name: string; count: number; avg_followers: number; color: string };
 type SegData = { clusters: Cluster[]; n_clusters: number };
@@ -46,7 +47,12 @@ export function WidgetUserSegmentation() {
             <Badge.Root variant='light' color='purple' size='medium'>K-Means</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <WidgetDetailsModal 
+          title="User Segmentation" 
+          moduleNumber="Module 6" 
+          description="K-means clustering of audience personas. Groups users based on behavioral metadata, engagement frequency, and follower demographics."
+          data={{ clusters: data.n_clusters, total_users: clusters.reduce((a, b) => a + b.count, 0) }}
+        />
       </div>
 
       <ResponsiveContainer width='100%' height={140}>

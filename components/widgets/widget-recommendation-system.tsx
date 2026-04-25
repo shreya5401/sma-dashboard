@@ -8,6 +8,7 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 
 type Rec = { title: string; score: number; type: string; author?: string };
 type RecData = { recommendations: Rec[]; method: string };
@@ -37,7 +38,12 @@ export function WidgetRecommendationSystem() {
             <Badge.Root variant='light' color='blue' size='medium'>Filtering</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <WidgetDetailsModal 
+          title="Recommendation System" 
+          moduleNumber="Module 4" 
+          description="Personalized content discovery engine. Leverages collaborative filtering and cosine similarity to surface high-relevance interactions."
+          data={{ suggestions: data.recommendations.length, engine: data.method }}
+        />
       </div>
 
       <div className='flex flex-col gap-3'>

@@ -11,6 +11,7 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 import * as ButtonGroup from '@/components/ui/button-group';
 
 type Series = { date: string; value: number }[];
@@ -67,7 +68,12 @@ export function WidgetDataVisualization() {
             <Badge.Root variant='light' color='blue' size='medium'>Charts</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <WidgetDetailsModal 
+          title="Data Visualization" 
+          moduleNumber="Module 7" 
+          description="High-frequency stream processing visualization. Maps global events into interactive temporal structures for real-time trend detection."
+          data={{ selected_metric: selected }}
+        />
       </div>
 
       <ButtonGroup.Root size='xxsmall' className='grid auto-cols-fr grid-flow-col' asChild>
