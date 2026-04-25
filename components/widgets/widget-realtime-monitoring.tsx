@@ -9,6 +9,7 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 
 type TimePoint = { time: string; mentions: number };
 type KW = { word: string; count: number; trend: string };
@@ -59,7 +60,12 @@ export function WidgetRealtimeMonitoring() {
             </Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <WidgetDetailsModal 
+          title="Real-Time Monitoring" 
+          moduleNumber="Module 10" 
+          description="High-velocity data ingestion and indexing. Tracks global mentions and topic spikes across multiple platforms with sub-second latency."
+          data={{ mentions_hr: data.mentions_per_hour, keywords_tracked: data.top_keywords.length }}
+        />
       </div>
 
       <ResponsiveContainer width='100%' height={110}>

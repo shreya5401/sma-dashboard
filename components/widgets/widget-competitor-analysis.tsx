@@ -10,6 +10,7 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 
 type MetricRow = { metric: string; brand?: number; compA?: number; compB?: number };
 type CompData = { brands: string[]; metrics: MetricRow[]; summary: string };
@@ -32,9 +33,7 @@ export function WidgetCompetitorAnalysis() {
   const brands = data.brands.length > 0 ? data.brands : FALLBACK.brands;
   const [b0, b1, b2] = brands;
 
-  const handleDetails = () => {
-    alert(`Showing detailed analysis for: ${brands.join(', ')}\n\nKeyword: ${keyword}`);
-  };
+
 
   return (
     <div className='relative flex w-full flex-col gap-6 rounded-2xl bg-bg-white-0 p-6 shadow-regular-sm ring-1 ring-inset ring-stroke-soft-200 transition-all hover:shadow-regular-md'>
@@ -43,7 +42,7 @@ export function WidgetCompetitorAnalysis() {
       <div className='flex items-start justify-between gap-4'>
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2'>
-            <span className='text-label-sm font-medium uppercase tracking-wider text-text-sub-600'>Competitor Analysis</span>
+            <span className='text-label-sm font-medium uppercase tracking-wider text-text-sub-600'>Module 11 · Competitor Analysis</span>
             <div className='size-1.5 rounded-full bg-success-base animate-pulse' />
           </div>
           <div className='flex items-center gap-2'>
@@ -51,9 +50,12 @@ export function WidgetCompetitorAnalysis() {
             <Badge.Root variant='light' color='blue' size='xsmall' className='font-semibold'>Benchmark</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall' className='rounded-lg px-3 hover:bg-bg-soft-200' onClick={handleDetails}>
-          Details
-        </Button.Root>
+        <WidgetDetailsModal 
+          title="Competitor Discovery" 
+          moduleNumber="Module 11" 
+          description="Cross-platform competitive benchmarking. Tracks market share, engagement delta, and strategy variance against industry leaders."
+          data={{ brands: brands.join(', '), summary: data.summary }}
+        />
       </div>
 
       <div className='h-[200px] w-full'>

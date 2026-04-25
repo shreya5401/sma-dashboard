@@ -9,6 +9,7 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
+import { WidgetDetailsModal } from '@/components/widget-details-modal';
 
 type DataPoint = { day: string; actual: number | null; predicted: number | null };
 type PredData = { historical: DataPoint[]; predicted: DataPoint[]; confidence: number; model: string; r_squared: number };
@@ -61,7 +62,12 @@ export function WidgetPopularityPrediction() {
             <Badge.Root variant='light' color='purple' size='medium'>ML Model</Badge.Root>
           </div>
         </div>
-        <Button.Root variant='neutral' mode='stroke' size='xxsmall'>Details</Button.Root>
+        <WidgetDetailsModal 
+          title="Popularity Prediction" 
+          moduleNumber="Module 12" 
+          description="Machine learning forecasting for content reach. Uses historical momentum and seasonal markers to predict future engagement peaks."
+          data={{ model: data.model, confidence: data.confidence, r_squared: data.r_squared }}
+        />
       </div>
 
       <ResponsiveContainer width='100%' height={140}>
