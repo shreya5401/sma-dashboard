@@ -51,6 +51,9 @@ def get_db():
             _db["scrape_sessions"].create_index(
                 [("keyword", ASCENDING), ("platform", ASCENDING), ("fetched_at", DESCENDING)]
             )
+            _db["influencer_snapshots"].create_index(
+                [("keyword", ASCENDING), ("platform", ASCENDING), ("fetched_at", DESCENDING)]
+            )
             print(f"[DB] Connected to MongoDB (Database: {db_name})")
         except ConnectionFailure as e:
             print(f"[DB] MongoDB connection failed (Connection Error): {e}")
@@ -108,3 +111,49 @@ def load_posts(keyword: str, platform: str) -> list[dict] | None:
     except Exception as e:
         print(f"[DB] load_posts failed: {e}")
     return None
+
+
+def save_influencer_snapshot(keyword: str, platform: str,
+                             scores: dict[str, float]) -> None:
+    """Persist a Module 9 centrality snapshot for later trend computation."""
+    db = get_db()
+    if db is None or not scores:
+        return
+    try:
+        now = datetime.now(timezone.utc)
+        db["influencer_snapshots"].insert_one({
+            "keyword": keyword.strip().title(),
+            "platform": platform,
+            "fetched_at": now,
+            "scores": scores,
+        })
+    except Exception as e:
+        print(f"[DB] save_influencer_snapshot failed: {e}")
+
+
+def load_previous_influencer_snapshot(keyword: str,
+                                      platform: str) -> dict[str, float] | None:
+    """Return the most recent *prior* snapshot's score map (user -> float).
+
+    Returns the second-most-recent document so that saving a fresh snapshot
+    before reading doesn't pollute the delta. Callers should load this
+    BEFORE saving the new snapshot, but this tolerates either order.
+    """
+    db = get_db()
+    if db is None:
+        return None
+    try:
+        from pymongo import DESCENDING
+        docs = list(db["influencer_snapshots"]
+                    .find({"keyword": {"$regex": f"^{keyword}$", "$options": "i"},
+                           "platform": platform},
+                          {"_id": 0, "scores": 1})
+                    .sort("fetched_at", DESCENDING)
+                    .limit(2))
+        if not docs:
+            return None
+        # Prefer the second-most-recent; fall back to the only one we have.
+        return docs[1]["scores"] if len(docs) > 1 else docs[0]["scores"]
+    except Exception as e:
+        print(f"[DB] load_previous_influencer_snapshot failed: {e}")
+        return None

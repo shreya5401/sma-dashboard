@@ -88,9 +88,36 @@ def api_ad_campaign(keyword: str = "Tesla", platform: str = "x", use_live: bool 
 
 
 @app.get("/api/influencer")
-def api_influencer(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
+def api_influencer(
+    keyword: str = "Tesla",
+    platform: str = "x",
+    use_live: bool = True,
+    include_graph: bool = False,
+):
     posts = _posts(keyword, platform, use_live)
-    return {**influencer.analyze(posts), "keyword": keyword}
+    result = influencer.analyze(posts)
+
+    # Diff against the previous snapshot so 'delta' reflects real movement
+    # over time rather than a static placeholder.
+    current_scores: dict[str, float] = result.pop("scores", {}) or {}
+    try:
+        from db import save_influencer_snapshot, load_previous_influencer_snapshot
+        previous = load_previous_influencer_snapshot(keyword, platform)
+        if previous:
+            for row in result.get("influencers", []):
+                user = row["name"].lstrip("@")
+                prev_score = float(previous.get(user, 0.0))
+                delta_val = round(row["score"] - prev_score, 3)
+                row["delta"] = f"+{delta_val:.3f}" if delta_val >= 0 else f"{delta_val:.3f}"
+        if current_scores:
+            save_influencer_snapshot(keyword, platform, current_scores)
+    except Exception as e:
+        print(f"[api_influencer] snapshot step skipped: {e}")
+
+    if not include_graph:
+        result.pop("graph", None)
+
+    return {**result, "keyword": keyword}
 
 
 @app.get("/api/monitoring")

@@ -94,6 +94,7 @@ def fetch_from_csv(keyword: str, platform: str = "x") -> list[dict]:
                 try:
                     if is_full:
                         hashtags = [h.strip().lstrip("#") for h in row.get("hashtags", "").split() if h.strip()]
+                        mentions = [m.strip().lstrip("@") for m in row.get("mentions", "").split() if m.strip()]
                         post = {
                             "id": str(row["tweet_id"]),
                             "text": row.get("text", ""),
@@ -103,6 +104,7 @@ def fetch_from_csv(keyword: str, platform: str = "x") -> list[dict]:
                             "retweets": _int(row.get("retweets")),
                             "replies": _int(row.get("replies")),
                             "hashtags": hashtags,
+                            "mentions": mentions,
                             "created_at": row.get("date", ""),
                             "platform": "x",
                             "sentiment_label": row.get("sentiment", ""),

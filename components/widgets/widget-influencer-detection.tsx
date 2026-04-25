@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { RiUserStarLine, RiArrowUpLine } from '@remixicon/react';
 import { useAtomValue } from 'jotai';
 
@@ -8,19 +9,21 @@ import { useModuleData } from '@/hooks/use-module-data';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import * as Badge from '@/components/ui/badge';
 import * as Button from '@/components/ui/button';
-import { WidgetDetailsModal } from '@/components/widget-details-modal';
-
-type Influencer = { rank: number; name: string; followers: string; score: number; delta: string };
-type InfluencerData = { influencers: Influencer[] };
+import {
+  InfluencerDetailsDrawer,
+  type InfluencerData,
+} from '@/components/widgets/influencer-details-drawer';
 
 const FALLBACK: InfluencerData = {
   influencers: [
-    { rank: 1, name: '@elonmusk_fan', followers: '2.4M', score: 0.98, delta: '+0.03' },
-    { rank: 2, name: '@teslaowner', followers: '840K', score: 0.87, delta: '+0.01' },
-    { rank: 3, name: '@evtech_daily', followers: '620K', score: 0.81, delta: '+0.05' },
-    { rank: 4, name: '@cleanenergy_x', followers: '415K', score: 0.74, delta: '-0.02' },
-    { rank: 5, name: '@spaceexplorer', followers: '390K', score: 0.69, delta: '+0.04' },
+    { rank: 1, name: '@elonmusk_fan', followers: '2.4M', score: 0.98, delta: '+0.03', mention_count: 0, engagement: 0 },
+    { rank: 2, name: '@teslaowner', followers: '840K', score: 0.87, delta: '+0.01', mention_count: 0, engagement: 0 },
+    { rank: 3, name: '@evtech_daily', followers: '620K', score: 0.81, delta: '+0.05', mention_count: 0, engagement: 0 },
+    { rank: 4, name: '@cleanenergy_x', followers: '415K', score: 0.74, delta: '-0.02', mention_count: 0, engagement: 0 },
+    { rank: 5, name: '@spaceexplorer', followers: '390K', score: 0.69, delta: '+0.04', mention_count: 0, engagement: 0 },
   ],
+  algorithm: 'eigenvector_centrality',
+  stats: { nodes: 0, edges: 0, components: 0 },
 };
 
 const BG_COLORS = ['bg-sky-200 text-sky-950', 'bg-purple-200 text-purple-950', 'bg-blue-200 text-blue-950', 'bg-red-200 text-red-950', 'bg-yellow-200 text-yellow-950'];
@@ -28,6 +31,7 @@ const BG_COLORS = ['bg-sky-200 text-sky-950', 'bg-purple-200 text-purple-950', '
 export function WidgetInfluencerDetection() {
   const keyword = useAtomValue(keywordAtom);
   const { data, loading } = useModuleData<InfluencerData>('influencer', keyword, FALLBACK);
+  const [open, setOpen] = React.useState(false);
 
   const list = data.influencers.length > 0 ? data.influencers : FALLBACK.influencers;
   const top = list[0];
@@ -43,12 +47,9 @@ export function WidgetInfluencerDetection() {
             <Badge.Root variant='light' color='yellow' size='medium'>Score {top?.score ?? '—'}</Badge.Root>
           </div>
         </div>
-        <WidgetDetailsModal 
-          title="Influencer Detection" 
-          moduleNumber="Module 9" 
-          description="Identification of high-impact accounts using centrality measures. Analyzes reach, engagement depth, and topical authority to map influence networks."
-          data={{ top_influencer: top?.name, influencer_count: list.length }}
-        />
+        <Button.Root variant='neutral' mode='stroke' size='xxsmall' onClick={() => setOpen(true)}>
+          Details
+        </Button.Root>
       </div>
 
       <div className='flex flex-col gap-2'>
@@ -75,6 +76,12 @@ export function WidgetInfluencerDetection() {
         <RiArrowUpLine className='size-4 text-text-soft-400' />
         <span className='text-paragraph-sm text-text-sub-600'>Ranked by Eigenvector Centrality</span>
       </div>
+
+      <InfluencerDetailsDrawer
+        open={open}
+        onOpenChange={setOpen}
+        keyword={keyword}
+      />
     </div>
   );
 }
