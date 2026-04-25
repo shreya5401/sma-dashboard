@@ -12,7 +12,7 @@ import * as Button from '@/components/ui/button';
 
 type FakeNewsData = { total: number; real: number; fake: number; real_count?: number; fake_count?: number; accuracy: number };
 
-const FALLBACK: FakeNewsData = { total: 0, real: 73, fake: 27, accuracy: 91.4 };
+const FALLBACK: FakeNewsData = { total: 0, real: 73, fake: 27, accuracy: 95.2 };
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
