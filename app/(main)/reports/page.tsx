@@ -57,24 +57,46 @@ export default function ReportsPage() {
     if (!reportRef.current) return;
     setGenerating(true);
     
+    const element = reportRef.current;
+    const originalWidth = element.style.width;
+    
+    // Stabilize the element for capture
+    element.style.width = '1024px';
+    element.style.fontFeatureSettings = '"kern" 0';
+    element.style.fontVariantLigatures = 'none';
+    
     try {
-      const canvas = await html2canvas(reportRef.current, {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        windowWidth: 1024,
+        imageTimeout: 0,
+        removeContainer: true,
       });
       
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      // Calculate dimensions to fit exactly one page
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const pdfWidth = 210; // A4 Width in mm
+      const pdfHeight = (imgHeight * pdfWidth) / imgWidth;
+
+      // Create PDF with custom height to fit all content on a single page
+      const pdf = new jsPDF('p', 'mm', [pdfWidth, pdfHeight]);
+      
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
       pdf.save(`SMA-Strategy-Report-${keyword || 'Global'}.pdf`);
     } catch (error) {
       console.error('PDF Generation failed:', error);
     } finally {
+      element.style.width = originalWidth;
+      element.style.fontFeatureSettings = '';
+      element.style.fontVariantLigatures = '';
       setGenerating(false);
     }
   };
@@ -110,10 +132,10 @@ export default function ReportsPage() {
 
       {keyword && (
         <div className="flex flex-col gap-8">
-          <div 
-            ref={reportRef} 
-            className="w-full max-w-5xl mx-auto bg-white p-16 shadow-regular-md rounded-xl border border-stroke-soft-200 text-black"
-          >
+            <div 
+              ref={reportRef} 
+              className="w-full max-w-5xl mx-auto bg-white p-16 shadow-regular-md rounded-xl border border-stroke-soft-200 text-black overflow-hidden"
+            >
             {/* Report Header */}
             <div className="flex justify-between items-end border-b-4 border-gray-900 pb-8 mb-12">
               <div>
