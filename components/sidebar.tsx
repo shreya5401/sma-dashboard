@@ -9,6 +9,7 @@ import {
   RiLayoutGridLine,
   RiSettings2Line,
   RiFileChartLine,
+  RiShuffleLine,
 } from '@remixicon/react';
 import { useSetAtom } from 'jotai';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -30,6 +31,7 @@ type NavigationLink = {
 
 export const navigationLinks: NavigationLink[] = [
   { icon: RiLayoutGridLine, label: 'Overview', href: '/' },
+  { icon: RiShuffleLine, label: 'Platform Comparison', href: '/comparison' },
   { icon: RiFileChartLine, label: 'Automated Reports', href: '/reports' },
 ];
 

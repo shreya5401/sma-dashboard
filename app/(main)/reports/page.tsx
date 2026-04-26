@@ -18,7 +18,8 @@ import {
   RiLightbulbLine,
   RiRobot2Line,
   RiPulseLine,
-  RiBarChartGroupedLine
+  RiBarChartGroupedLine,
+  RiGlobalLine
 } from '@remixicon/react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -368,6 +369,8 @@ export default function ReportsPage() {
                   </div>
                 </div>
               </section>
+
+
 
             </div>
 
