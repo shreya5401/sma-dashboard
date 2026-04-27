@@ -47,7 +47,7 @@ export function WidgetCompetitorAnalysis() {
           </div>
           <div className='flex items-center gap-2'>
             <h3 className='text-title-h5 font-bold text-text-strong-950'>{brands.length} Brands Compared</h3>
-            <Badge.Root variant='light' color='blue' size='xsmall' className='font-semibold'>Benchmark</Badge.Root>
+            <Badge.Root variant='light' color='blue' size='small' className='font-semibold'>Benchmark</Badge.Root>
           </div>
         </div>
         <WidgetDetailsModal 

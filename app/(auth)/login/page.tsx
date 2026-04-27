@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useSignIn } from '@clerk/nextjs';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import {
   RiEyeLine,
@@ -51,6 +53,44 @@ function PasswordInput(
 }
 
 export default function PageLogin() {
+  const { isLoaded, signIn, setActive } = useSignIn();
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [error, setError] = React.useState('');
+  const router = useRouter();
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isLoaded) return;
+
+    try {
+      const result = await signIn.create({
+        identifier: email,
+        password,
+      });
+
+      if (result.status === 'complete') {
+        await setActive({ session: result.createdSessionId });
+        router.push('/');
+      } else {
+        console.log(result);
+        setError('Unexpected error occurred');
+      }
+    } catch (err: any) {
+      console.error('Error:', err.errors[0]?.longMessage);
+      setError(err.errors[0]?.longMessage || 'An error occurred during sign in');
+    }
+  };
+
+  const handleOAuth = (provider: 'oauth_apple' | 'oauth_google' | 'oauth_linkedin_oidc') => {
+    if (!isLoaded) return;
+    signIn.authenticateWithRedirect({
+      strategy: provider,
+      redirectUrl: '/sso-callback',
+      redirectUrlComplete: '/',
+    });
+  };
+
   return (
     <>
       <div className='flex flex-col items-center gap-2'>
@@ -84,68 +124,92 @@ export default function PageLogin() {
         </div>
       </div>
 
+      {error && (
+        <div className='text-center text-error-base text-paragraph-sm'>
+          {error}
+        </div>
+      )}
+
       <div className='grid w-full auto-cols-fr grid-flow-col gap-3'>
         <SocialButton.Root
           mode='stroke'
           brand='apple'
           className='text-social-apple'
+          onClick={() => handleOAuth('oauth_apple')}
         >
           <SocialButton.Icon as={IconApple} />
         </SocialButton.Root>
-        <SocialButton.Root mode='stroke' brand='google'>
+        <SocialButton.Root 
+          mode='stroke' 
+          brand='google'
+          onClick={() => handleOAuth('oauth_google')}
+        >
           <SocialButton.Icon as={IconGoogle} />
         </SocialButton.Root>
-        <SocialButton.Root mode='stroke' brand='linkedin'>
+        <SocialButton.Root 
+          mode='stroke' 
+          brand='linkedin'
+          onClick={() => handleOAuth('oauth_linkedin_oidc')}
+        >
           <SocialButton.Icon as={IconLinkedin} />
         </SocialButton.Root>
       </div>
 
       <Divider.Root variant='line-text'>OR</Divider.Root>
 
-      <div className='space-y-3'>
-        <div className='space-y-1'>
-          <Label.Root htmlFor='email'>
-            Email Address <Label.Asterisk />
-          </Label.Root>
-          <Input.Root>
-            <Input.Wrapper>
-              <Input.Icon as={RiMailLine} />
-              <Input.Input
-                id='email'
-                type='email'
-                placeholder='hello@alignui.com'
-                required
-              />
-            </Input.Wrapper>
-          </Input.Root>
+      <form onSubmit={handleSignIn} className='space-y-6'>
+        <div className='space-y-3'>
+          <div className='space-y-1'>
+            <Label.Root htmlFor='email'>
+              Email Address <Label.Asterisk />
+            </Label.Root>
+            <Input.Root>
+              <Input.Wrapper>
+                <Input.Icon as={RiMailLine} />
+                <Input.Input
+                  id='email'
+                  type='email'
+                  placeholder='hello@alignui.com'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </Input.Wrapper>
+            </Input.Root>
+          </div>
+
+          <div className='space-y-1'>
+            <Label.Root htmlFor='password'>
+              Password <Label.Asterisk />
+            </Label.Root>
+            <PasswordInput 
+              id='password' 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required 
+            />
+          </div>
         </div>
 
-        <div className='space-y-1'>
-          <Label.Root htmlFor='password'>
-            Password <Label.Asterisk />
-          </Label.Root>
-          <PasswordInput id='password' required />
+        <div className='flex items-center justify-between gap-4'>
+          <div className='flex items-start gap-2'>
+            <Checkbox.Root id='agree' />
+            <LabelPrimitive.Root
+              htmlFor='agree'
+              className='block cursor-pointer text-paragraph-sm'
+            >
+              Keep me logged in
+            </LabelPrimitive.Root>
+          </div>
+          <LinkButton.Root variant='gray' size='medium' underline asChild>
+            <Link href='/reset-password'>Forgot password?</Link>
+          </LinkButton.Root>
         </div>
-      </div>
 
-      <div className='flex items-center justify-between gap-4'>
-        <div className='flex items-start gap-2'>
-          <Checkbox.Root id='agree' />
-          <LabelPrimitive.Root
-            htmlFor='agree'
-            className='block cursor-pointer text-paragraph-sm'
-          >
-            Keep me logged in
-          </LabelPrimitive.Root>
-        </div>
-        <LinkButton.Root variant='gray' size='medium' underline asChild>
-          <Link href='/reset-password'>Forgot password?</Link>
-        </LinkButton.Root>
-      </div>
-
-      <FancyButton.Root variant='primary' size='medium'>
-        Login
-      </FancyButton.Root>
+        <FancyButton.Root type='submit' variant='primary' size='medium'>
+          Login
+        </FancyButton.Root>
+      </form>
     </>
   );
 }

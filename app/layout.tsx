@@ -8,6 +8,7 @@ import localFont from 'next/font/local';
 
 import { SearchMenu } from '@/components/search';
 import { Providers } from '@/app/providers';
+import { ClerkProvider } from '@clerk/nextjs';
 
 const inter = FontSans({
   subsets: ['latin'],
@@ -38,10 +39,12 @@ export default function RootLayout({
       className={cn(inter.variable, interVar.variable, 'antialiased')}
     >
       <body className='bg-bg-white-0'>
-        <Providers>
-          {children}
-          <SearchMenu />
-        </Providers>
+        <ClerkProvider>
+          <Providers>
+            {children}
+            <SearchMenu />
+          </Providers>
+        </ClerkProvider>
       </body>
     </html>
   );
