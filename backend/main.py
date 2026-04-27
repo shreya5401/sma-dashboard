@@ -187,7 +187,7 @@ def api_chat(data: dict):
     from models import competitor
     db = get_db()
     discovered = ["rival brands"]
-    if db:
+    if db is not None:
         all_brands = db["posts"].distinct("keyword")
         discovered = competitor.find_competitors(keyword, all_brands)
 

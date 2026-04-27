@@ -29,9 +29,12 @@ def _get_jwks() -> dict:
         url = _get_jwks_url()
         if not url:
             raise HTTPException(status_code=500, detail="Clerk JWKS URL not configured")
-        resp = httpx.get(url, timeout=10.0)
-        resp.raise_for_status()
-        _jwks_cache = resp.json()
+        try:
+            resp = httpx.get(url, timeout=10.0)
+            resp.raise_for_status()
+            _jwks_cache = resp.json()
+        except httpx.HTTPError as exc:
+            raise HTTPException(status_code=500, detail=f"Failed to fetch Clerk JWKS: {exc}")
     return _jwks_cache
 
 
