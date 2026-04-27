@@ -12,6 +12,7 @@ from models import (
     sentiment, trending, network, recommendation,
     fake_news, segmentation, data_viz, ad_campaign,
     influencer, monitoring, competitor, prediction, chatbot,
+    platform_comparison
 )
 
 app = FastAPI(title="Social Media Analytics API", version="1.0.0")
@@ -155,6 +156,11 @@ def api_competitor(
 def api_prediction(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**prediction.analyze(posts), "keyword": keyword}
+
+
+@app.get("/api/platform-comparison")
+def api_platform_comparison(keyword: str = "Tesla"):
+    return platform_comparison.analyze(keyword)
 
 
 @app.post("/api/chat")
