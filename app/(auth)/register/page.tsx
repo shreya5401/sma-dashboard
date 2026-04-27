@@ -1,6 +1,8 @@
 'use client';
 
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
+import { useSignUp } from '@clerk/nextjs';
 import {
   RiEyeLine,
   RiEyeOffLine,
@@ -49,6 +51,48 @@ function PasswordInput(
 }
 
 export default function PageRegister() {
+  const { isLoaded, signUp, setActive } = useSignUp();
+  const [fullName, setFullName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [error, setError] = React.useState('');
+  const router = useRouter();
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isLoaded) return;
+
+    const parts = fullName.split(' ');
+    const firstName = parts[0];
+    const lastName = parts.slice(1).join(' ');
+
+    try {
+      await signUp.create({
+        firstName,
+        lastName,
+        emailAddress: email,
+        password,
+      });
+
+      // Send verification email
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      
+      router.push('/verification');
+    } catch (err: any) {
+      console.error('Error:', err.errors[0]?.longMessage);
+      setError(err.errors[0]?.longMessage || 'An error occurred during sign up');
+    }
+  };
+
+  const handleOAuth = (provider: 'oauth_apple' | 'oauth_google' | 'oauth_linkedin_oidc') => {
+    if (!isLoaded) return;
+    signUp.authenticateWithRedirect({
+      strategy: provider,
+      redirectUrl: '/sso-callback',
+      redirectUrlComplete: '/',
+    });
+  };
+
   return (
     <>
       <div className='flex flex-col items-center space-y-2'>
@@ -82,73 +126,99 @@ export default function PageRegister() {
         </div>
       </div>
 
+      {error && (
+        <div className='text-center text-error-base text-paragraph-sm'>
+          {error}
+        </div>
+      )}
+
       <div className='grid w-full auto-cols-fr grid-flow-col gap-3'>
         <SocialButton.Root
           mode='stroke'
           brand='apple'
           className='text-social-apple'
+          onClick={() => handleOAuth('oauth_apple')}
         >
           <SocialButton.Icon as={IconApple} />
         </SocialButton.Root>
-        <SocialButton.Root mode='stroke' brand='google'>
+        <SocialButton.Root 
+          mode='stroke' 
+          brand='google'
+          onClick={() => handleOAuth('oauth_google')}
+        >
           <SocialButton.Icon as={IconGoogle} />
         </SocialButton.Root>
-        <SocialButton.Root mode='stroke' brand='linkedin'>
+        <SocialButton.Root 
+          mode='stroke' 
+          brand='linkedin'
+          onClick={() => handleOAuth('oauth_linkedin_oidc')}
+        >
           <SocialButton.Icon as={IconLinkedin} />
         </SocialButton.Root>
       </div>
 
       <Divider.Root variant='line-text'>OR</Divider.Root>
 
-      <div className='space-y-3'>
-        <div className='space-y-1'>
-          <Label.Root htmlFor='fullname'>
-            Full Name <Label.Asterisk />
-          </Label.Root>
-          <Input.Root>
-            <Input.Wrapper>
-              <Input.Input
-                id='fullname'
-                type='text'
-                placeholder='James Brown'
-                required
-              />
-            </Input.Wrapper>
-          </Input.Root>
+      <form onSubmit={handleSignUp} className='space-y-6'>
+        <div className='space-y-3'>
+          <div className='space-y-1'>
+            <Label.Root htmlFor='fullname'>
+              Full Name <Label.Asterisk />
+            </Label.Root>
+            <Input.Root>
+              <Input.Wrapper>
+                <Input.Input
+                  id='fullname'
+                  type='text'
+                  placeholder='James Brown'
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+              </Input.Wrapper>
+            </Input.Root>
+          </div>
+
+          <div className='space-y-1'>
+            <Label.Root htmlFor='email'>
+              Email Address <Label.Asterisk />
+            </Label.Root>
+            <Input.Root>
+              <Input.Wrapper>
+                <Input.Icon as={RiMailLine} />
+                <Input.Input
+                  id='email'
+                  type='email'
+                  placeholder='hello@alignui.com'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </Input.Wrapper>
+            </Input.Root>
+          </div>
+
+          <div className='space-y-1'>
+            <Label.Root htmlFor='password'>
+              Password <Label.Asterisk />
+            </Label.Root>
+            <PasswordInput 
+              id='password' 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required 
+            />
+            <Hint.Root>
+              <Hint.Icon as={RiInformationFill} />
+              Must contain 1 uppercase letter, 1 number, min. 8 characters.
+            </Hint.Root>
+          </div>
         </div>
 
-        <div className='space-y-1'>
-          <Label.Root htmlFor='email'>
-            Email Address <Label.Asterisk />
-          </Label.Root>
-          <Input.Root>
-            <Input.Wrapper>
-              <Input.Icon as={RiMailLine} />
-              <Input.Input
-                id='email'
-                type='email'
-                placeholder='hello@alignui.com'
-                required
-              />
-            </Input.Wrapper>
-          </Input.Root>
-        </div>
-
-        <div className='space-y-1'>
-          <Label.Root htmlFor='password'>
-            Password <Label.Asterisk />
-          </Label.Root>
-          <PasswordInput id='password' required />
-          <Hint.Root>
-            <Hint.Icon as={RiInformationFill} />
-            Must contain 1 uppercase letter, 1 number, min. 8 characters.
-          </Hint.Root>
-        </div>
-      </div>
-
-      <FancyButton.Root variant='primary' size='medium'>
-        Register
-      </FancyButton.Root>
+        <FancyButton.Root type='submit' variant='primary' size='medium'>
+          Register
+        </FancyButton.Root>
+      </form>
     </>
   );
 }

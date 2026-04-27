@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { useClerk, useUser } from '@clerk/nextjs';
 import {
   RiAddLine,
   RiArrowDownSLine,
@@ -24,6 +25,8 @@ import IconVerifiedFill from '~/icons/icon-verified-fill.svg';
 
 export function UserButton({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme();
+  const { user } = useUser();
+  const { signOut } = useClerk();
 
   return (
     <Dropdown.Root>
@@ -34,7 +37,7 @@ export function UserButton({ className }: { className?: string }) {
         )}
       >
         <Avatar.Root size='40'>
-          <Avatar.Image src='/images/avatar/illustration/james.png' alt='' />
+          <Avatar.Image src={user?.imageUrl || '/images/avatar/illustration/james.png'} alt='' />
         </Avatar.Root>
         <div
           className='flex w-[172px] shrink-0 items-center gap-3'
@@ -42,11 +45,11 @@ export function UserButton({ className }: { className?: string }) {
         >
           <div className='flex-1 space-y-1'>
             <div className='flex items-center gap-0.5 text-label-sm'>
-              James Brown
+              {user?.fullName || 'User'}
               <IconVerifiedFill className='size-5 text-verified-base' />
             </div>
-            <div className='text-paragraph-xs text-text-sub-600'>
-              james@alignui.com
+            <div className='text-paragraph-xs text-text-sub-600 truncate'>
+              {user?.primaryEmailAddress?.emailAddress || 'user@example.com'}
             </div>
           </div>
 
@@ -88,11 +91,9 @@ export function UserButton({ className }: { className?: string }) {
             <Dropdown.ItemIcon as={RiAddLine} />
             Add Account
           </Dropdown.Item>
-          <Dropdown.Item asChild>
-            <Link href='/login'>
-              <Dropdown.ItemIcon as={RiLogoutBoxRLine} />
-              Logout
-            </Link>
+          <Dropdown.Item onSelect={() => signOut({ redirectUrl: '/login' })}>
+            <Dropdown.ItemIcon as={RiLogoutBoxRLine} />
+            Logout
           </Dropdown.Item>
         </Dropdown.Group>
         <div className='p-2 text-paragraph-sm text-text-soft-400'>
@@ -105,6 +106,8 @@ export function UserButton({ className }: { className?: string }) {
 
 export function UserButtonMobile({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme();
+  const { user } = useUser();
+  const { signOut } = useClerk();
 
   return (
     <Dropdown.Root modal={false}>
@@ -115,15 +118,15 @@ export function UserButtonMobile({ className }: { className?: string }) {
         )}
       >
         <Avatar.Root size='48' color='blue'>
-          <Avatar.Image src='/images/avatar/illustration/james.png' alt='' />
+          <Avatar.Image src={user?.imageUrl || '/images/avatar/illustration/james.png'} alt='' />
         </Avatar.Root>
-        <div className='flex-1 space-y-1'>
+        <div className='flex-1 space-y-1 truncate'>
           <div className='flex items-center gap-0.5 text-label-md'>
-            James Brown
+            {user?.fullName || 'User'}
             <IconVerifiedFill className='size-5 text-verified-base' />
           </div>
-          <div className='text-paragraph-sm text-text-sub-600'>
-            james@alignui.com
+          <div className='text-paragraph-sm text-text-sub-600 truncate'>
+            {user?.primaryEmailAddress?.emailAddress || 'user@example.com'}
           </div>
         </div>
         <div
@@ -169,11 +172,9 @@ export function UserButtonMobile({ className }: { className?: string }) {
             <Dropdown.ItemIcon as={RiAddLine} />
             Add Account
           </Dropdown.Item>
-          <Dropdown.Item asChild>
-            <Link href='/login'>
-              <Dropdown.ItemIcon as={RiLogoutBoxRLine} />
-              Logout
-            </Link>
+          <Dropdown.Item onSelect={() => signOut({ redirectUrl: '/login' })}>
+            <Dropdown.ItemIcon as={RiLogoutBoxRLine} />
+            Logout
           </Dropdown.Item>
         </Dropdown.Group>
         <div className='p-2 text-paragraph-sm text-text-soft-400'>
