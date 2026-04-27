@@ -28,7 +28,7 @@ const slides: Slide[] = [
     content: (
       <>
         <span className='text-white'>
-          The Marketing Management app has revolutionized our tasks.
+          The Social Media Analysis Dashboard helps revolutionize tasks.
         </span>{' '}
         It&apos;s efficient and user-friendly, streamlining planning to
         tracking.

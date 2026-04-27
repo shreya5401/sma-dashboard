@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from auth import verify_token
 
 try:
     from dotenv import load_dotenv
@@ -25,6 +27,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# All /api routes require a valid Clerk JWT
+api = APIRouter(prefix="/api", dependencies=[Depends(verify_token)])
+
 
 def _posts(keyword: str, platform: str, use_live: bool, limit: int = 100) -> list[dict]:
     return fetch_posts(keyword, platform, use_live, limit)
@@ -40,55 +45,55 @@ def health():
     return {"status": "ok"}
 
 
-@app.get("/api/sentiment")
+@api.get("/sentiment")
 def api_sentiment(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**sentiment.analyze(posts), "keyword": keyword, "total_fetched": len(posts)}
 
 
-@app.get("/api/trending")
+@api.get("/trending")
 def api_trending(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**trending.analyze(posts), "keyword": keyword}
 
 
-@app.get("/api/network")
+@api.get("/network")
 def api_network(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**network.analyze(posts), "keyword": keyword}
 
 
-@app.get("/api/recommendation")
+@api.get("/recommendation")
 def api_recommendation(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**recommendation.analyze(posts), "keyword": keyword}
 
 
-@app.get("/api/fake-news")
+@api.get("/fake-news")
 def api_fake_news(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**fake_news.analyze(posts), "keyword": keyword}
 
 
-@app.get("/api/segmentation")
+@api.get("/segmentation")
 def api_segmentation(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**segmentation.analyze(posts), "keyword": keyword}
 
 
-@app.get("/api/data-viz")
+@api.get("/data-viz")
 def api_data_viz(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**data_viz.analyze(posts), "keyword": keyword}
 
 
-@app.get("/api/ad-campaign")
+@api.get("/ad-campaign")
 def api_ad_campaign(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**ad_campaign.analyze(posts), "keyword": keyword}
 
 
-@app.get("/api/influencer")
+@api.get("/influencer")
 def api_influencer(
     keyword: str = "Tesla",
     platform: str = "x",
@@ -121,13 +126,13 @@ def api_influencer(
     return {**result, "keyword": keyword}
 
 
-@app.get("/api/monitoring")
+@api.get("/monitoring")
 def api_monitoring(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**monitoring.analyze(posts, keyword), "keyword": keyword}
 
 
-@app.get("/api/competitor")
+@api.get("/competitor")
 def api_competitor(
     keyword: str = "Tesla",
     competitors: str = "auto",
@@ -136,11 +141,9 @@ def api_competitor(
 ):
     from db import get_db
     db = get_db()
-    
-    # Fallback to defaults if DB is unreachable
+
     if db is None:
         brands = [keyword] + ["Meta", "Google"]
-    # If competitors is 'auto' or we are searching for something not in the hardcoded defaults
     elif competitors == "auto" or not competitors or competitors == "Ford,BMW":
         all_brands = db["posts"].distinct("keyword")
         discovered = competitor.find_competitors(keyword, all_brands)
@@ -152,38 +155,34 @@ def api_competitor(
     return {**competitor.analyze(brand_posts), "keyword": keyword}
 
 
-@app.get("/api/prediction")
+@api.get("/prediction")
 def api_prediction(keyword: str = "Tesla", platform: str = "x", use_live: bool = True):
     posts = _posts(keyword, platform, use_live)
     return {**prediction.analyze(posts), "keyword": keyword}
 
 
-@app.get("/api/platform-comparison")
+@api.get("/platform-comparison")
 def api_platform_comparison(keyword: str = "Tesla"):
     return platform_comparison.analyze(keyword)
 
 
-@app.post("/api/chat")
+@api.post("/chat")
 def api_chat(data: dict):
     message = data.get("message", "")
     context = data.get("context", {})
     keyword = context.get("keyword", "the current brand")
-    
-    # 1. Fetch live stats for the AI to use
+
     from data_fetcher import fetch_posts
-    posts = fetch_posts(keyword, use_live=False) # Fast fetch from DB/CSV
-    
+    posts = fetch_posts(keyword, use_live=False)
+
     live_stats = "No live data available."
     if posts:
         avg_likes = sum(p.get("likes", 0) for p in posts) / len(posts)
         hashtags = [h for p in posts for h in p.get("hashtags", [])]
         top_h = sorted(set(hashtags), key=hashtags.count, reverse=True)[:3]
-        
-        # Simple sentiment mock/calc
-        pos = len([p for p in posts if p.get("likes", 0) > 500]) # Example proxy
+        pos = len([p for p in posts if p.get("likes", 0) > 500])
         live_stats = f"Avg Likes: {avg_likes:.1f}, Top Hashtags: {', '.join(top_h)}, High Engagement Posts: {pos}"
 
-    # 2. Dynamically find competitors
     from db import get_db
     from models import competitor
     db = get_db()
@@ -191,18 +190,17 @@ def api_chat(data: dict):
     if db:
         all_brands = db["posts"].distinct("keyword")
         discovered = competitor.find_competitors(keyword, all_brands)
-    
+
     return {"response": chatbot.get_chat_response(
-        message, 
-        keyword=keyword, 
+        message,
+        keyword=keyword,
         competitors=", ".join(discovered),
         live_stats=live_stats
     )}
 
 
-@app.get("/api/posts")
+@api.get("/posts")
 def api_posts(keyword: str = "Tesla", platform: str = "x", limit: int = 50):
-    """Browse raw posts stored in MongoDB for a keyword."""
     from db import get_db
     db = get_db()
     if db is None:
@@ -214,3 +212,6 @@ def api_posts(keyword: str = "Tesla", platform: str = "x", limit: int = 50):
         sort=[("fetched_at", -1)],
     ))
     return {"keyword": keyword, "platform": platform, "count": len(posts), "posts": posts}
+
+
+app.include_router(api)

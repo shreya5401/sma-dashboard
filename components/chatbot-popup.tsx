@@ -7,6 +7,7 @@ import { RiChat3Line, RiCloseLine, RiRobotLine, RiSendPlane2Line, RiExpandDiagon
 import { motion, AnimatePresence } from 'framer-motion';
 import { keywordAtom, chatbotOpenAtom } from '@/lib/atoms';
 import { useAtom, useAtomValue } from 'jotai';
+import { useAuth } from '@clerk/nextjs';
 
 const QUICK_SUGGESTIONS = [
   "How does this dashboard work?",
@@ -29,6 +30,7 @@ export default function ChatbotPopup() {
   const [isTyping, setIsTyping] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const keyword = useAtomValue(keywordAtom);
+  const { getToken } = useAuth();
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -61,9 +63,13 @@ export default function ChatbotPopup() {
     setShowGreeting(false);
 
     try {
+      const token = await getToken();
       const res = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ message: userMsg, context: { keyword } }),
       });
       const data = await res.json();

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useAuth } from '@clerk/nextjs';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 
@@ -13,6 +14,7 @@ export function useModuleData<T>(
   const [data, setData] = React.useState<T>(fallback);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const { getToken } = useAuth();
 
   React.useEffect(() => {
     if (!keyword) return;
@@ -21,24 +23,29 @@ export function useModuleData<T>(
     setError(null);
 
     const params = new URLSearchParams({ keyword, ...extraParams });
-    fetch(`${API_BASE}/api/${endpoint}?${params}`, { signal: controller.signal })
-      .then((r) => {
+
+    async function fetchData() {
+      try {
+        const token = await getToken();
+        const r = await fetch(`${API_BASE}/api/${endpoint}?${params}`, {
+          signal: controller.signal,
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
-      .then((d) => {
+        const d = await r.json();
         setData(d);
         setLoading(false);
-      })
-      .catch((e) => {
+      } catch (e: any) {
         if (e.name !== 'AbortError') {
           setError(e.message);
           setLoading(false);
         }
-      });
+      }
+    }
 
+    fetchData();
     return () => controller.abort();
-  }, [endpoint, keyword, JSON.stringify(extraParams)]);
+  }, [endpoint, keyword, JSON.stringify(extraParams), getToken]);
 
   return { data, loading, error };
 }
